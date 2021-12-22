@@ -50,6 +50,10 @@ public class Utils {
         throw new FatalMessageException("Stop with fatal: " + tag + " " + msg);
     }
 
-    public class FatalMessageException extends IllegalStateException {}
+    public static class FatalMessageException extends IllegalStateException {
+        public FatalMessageException(String s) {
+            super(s);
+        }
+    }
 }
 

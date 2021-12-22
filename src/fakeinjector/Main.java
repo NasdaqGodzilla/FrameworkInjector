@@ -42,6 +42,10 @@ public class Main {
         }
     }
 
-    class EarlyExitException extends RuntimeException {}
+    public static class EarlyExitException extends RuntimeException {
+        public EarlyExitException(String s) {
+            super(s);
+        }
+    }
 }
 
