@@ -50,6 +50,10 @@ public class Utils {
         throw new FatalMessageException("Stop with fatal: " + tag + " " + msg);
     }
 
+    public static void copyTo(String sourceFilePath, String to) throws java.io.IOException {
+        java.nio.file.Files.copy(new java.io.File(sourceFilePath).toPath(), new java.io.File(to).toPath());
+    }
+
     public static class FatalMessageException extends IllegalStateException {
         public FatalMessageException(String s) {
             super(s);

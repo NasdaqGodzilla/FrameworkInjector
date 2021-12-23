@@ -35,10 +35,25 @@ public class Main {
     public static void main(String[] args) throws EarlyExitException {
         Utils.message("frameworkinjector", "frameworkinjector work!");
 
-        if (null != args && 0 < args.length) {
-            for (String arg : args)
-                if ("-earlyexit".equals(arg.trim()))
-                    throw new EarlyExitException("early exit");
+        String inJar = null;
+        String outJar = null;
+
+        for (int i = 0; i < args.length; i++) {
+            if ("-i".equals(args[i].trim())) {
+                i++;
+                inJar = args[i].trim();
+            } else if ("-o".equals(args[i].trim())) {
+                i++;
+                outJar = args[i].trim();
+            }
+        }
+
+        Utils.message("fakeinjector", "inJar-outJar: " + inJar + " " + outJar);
+
+        try {
+            Utils.copyTo(inJar, outJar);
+        } catch (java.io.IOException e) {
+            Utils.fatal("fakeinjector", "" + e);
         }
     }
 
