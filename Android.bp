@@ -2,4 +2,7 @@ java_binary_host {
     name: "framework_injector",
     manifest: "manifest.txt",
     srcs: ["src/**/*.java"],
+    static_libs: [
+        "javassist_default",
+    ],
 }
