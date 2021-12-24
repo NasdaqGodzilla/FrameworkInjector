@@ -32,17 +32,21 @@
 package peacemaker.frameworkinjector;
 
 public class ClassMethodPointcut extends BaseMethodPointcut {
-    protected final String className;
+    protected final CharSequence className;
 
-    public String getClassName() {
+    public CharSequence getClassName() {
         return className;
     }
 
-    public ClassMethodPointcut(String c, String m) {
+    public CharSequence getStyledIdentifier() {
+        return className;
+    }
+
+    public ClassMethodPointcut(CharSequence c, CharSequence m) {
         this(c, m, null);
     }
 
-    public ClassMethodPointcut(String c, String m, String[] p) {
+    public ClassMethodPointcut(CharSequence c, CharSequence m, String[] p) {
         super(m, p);
 
         assert !Utils.isEmpty(c);
