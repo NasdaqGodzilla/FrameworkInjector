@@ -23,37 +23,58 @@
     \  \:\        \  \:\        \  \:\        \  \::/       \  \:\
      \__\/         \__\/         \__\/         \__\/         \__\/
  *
- * Filename     @ ClassMethodPointcut.java
- * Create date  @ 2021-12-24 15:17:27
- * Description  @
+ * Filename     @ BasePointcutCollections.java
+ * Create date  @ 2021-12-24 16:05:43
+ * Description  @ 保存切点的集合的基类。
  * version      @ V1.0.0
  */
 
 package peacemaker.frameworkinjector;
 
-public class ClassMethodPointcut extends BaseMethodPointcut {
-    protected final CharSequence className;
+public abstract class BasePointcutCollections<E extends BaseMethodPointcut> {
+    protected final java.util.AbstractCollection<E> mPoints;
 
-    public CharSequence getClassName() {
-        return className;
+    // 子类根据业务逻辑[选择]将集合内的元素[add]到自己的mPoints内
+    public interface Kitchen<E> { // 厨房
+        // [选择]闻起来挺香，子类业务逻辑允许[add]，返回true
+        boolean smellsGood(E e);
+        // [add]吃了该元素，若子类将e加入mPoints返回true
+        boolean ate(E e);
+        // 添加list内所有smellsGood的元素到mPoints内，若滴水未进则返回false
+        boolean ate(java.util.List<E> list);
     }
 
-    @Override
-    public CharSequence getStyledIdentifier() {
-        return className;
+    public BasePointcutCollections(java.util.AbstractCollection<E> c) {
+        mPoints = c;
     }
 
-    public ClassMethodPointcut(CharSequence c, CharSequence m) {
-        this(c, m, null);
+    public java.util.AbstractCollection<E> getPoints() {
+        return mPoints;
     }
 
-    public ClassMethodPointcut(CharSequence c, CharSequence m, String[] p) {
-        super(m, p);
+    public final void addSilent(E e) {
+        try {
+            add(e);
+        } catch (java.lang.RuntimeException ex) {
+            Utils.message("", "" + ex);
+        }
+    }
 
-        assert !Utils.isEmpty(c);
-        assert !Utils.isEmpty(m);
+    public final void add(E e) throws java.lang.RuntimeException {
+        mPoints.add(e);
+    }
 
-        className = c;
+    public final boolean containsSilent(E e) {
+        try {
+            return contains(e);
+        } catch (java.lang.RuntimeException ex) {
+            Utils.message("", "" + ex);
+        }
+        return false;
+    }
+
+    public final boolean contains(E e) throws java.lang.RuntimeException {
+        return mPoints.contains(e);
     }
 }
 
