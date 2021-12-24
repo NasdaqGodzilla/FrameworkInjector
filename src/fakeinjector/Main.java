@@ -32,28 +32,35 @@
 package peacemaker.frameworkinjector;
 
 public class Main {
+    private static final String exp = "\r\n==========================================\r\n";
+
     public static void main(String[] args) throws EarlyExitException {
         Utils.message("frameworkinjector", "frameworkinjector work!");
+        Utils.message("frameworkinjector", exp);
 
         String inJar = null;
         String outJar = null;
+        String pointcuts = null;
 
         for (int i = 0; i < args.length; i++) {
-            if ("-i".equals(args[i].trim())) {
-                i++;
-                inJar = args[i].trim();
-            } else if ("-o".equals(args[i].trim())) {
-                i++;
-                outJar = args[i].trim();
+            final String arg_ = args[i].trim();
+            if ("-i".equals(arg_)) {
+                inJar = args[++i].trim();
+            } else if ("-o".equals(arg_)) {
+                outJar = args[++i].trim();
+            } else if ("-pointcuts".equals(arg_)) {
+                pointcuts = args[++i].trim();
             }
         }
 
-        Utils.message("fakeinjector", "inJar-outJar: " + inJar + " " + outJar);
+        Utils.message("frameworkinjector", "inJar-outJar: " + inJar + " " + outJar +
+                " pointcuts: " + pointcuts);
+        Utils.message("frameworkinjector", exp);
 
         try {
             Utils.copyTo(inJar, outJar);
         } catch (java.io.IOException e) {
-            Utils.fatal("fakeinjector", "" + e);
+            Utils.fatal("frameworkinjector", "" + e);
         }
     }
 
