@@ -68,18 +68,19 @@ public class ClassPointcutCollections<T extends BaseMethodPointcut> extends Base
     public boolean ate(java.util.List<T> elements) {
         assert null != elements;
 
-        boolean ret = false;
+        boolean[] ret = new boolean[1];
+        ret[0] = false;
 
         elements.forEach(element -> {
             if (ate(element)) {
-                ret = true;
+                ret[0] = true;
             }
         });
 
         Utils.message(TAG, "" + mClassName + " with mPoints: " +
                 mPoints.size() + ": " + mPoints.toString());
 
-        return ret;
+        return ret[0];
     }
 }
 
