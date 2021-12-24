@@ -32,10 +32,10 @@
 package peacemaker.frameworkinjector;
 
 public abstract class BaseMethodPointcut {
-    protected final String methodName;
+    protected final CharSequence methodName;
     protected final String[] paramTypes;
 
-    public String getMethodName() {
+    public CharSequence getMethodName() {
         return methodName;
     }
 
@@ -43,11 +43,15 @@ public abstract class BaseMethodPointcut {
         return paramTypes;
     }
 
-    public BaseMethodPointcut(String m) {
+    public CharSequence getStyledIdentifier() {
+        return methodName;
+    }
+
+    public BaseMethodPointcut(CharSequence m) {
         this(m, null);
     }
 
-    public BaseMethodPointcut(String m, String[] p) {
+    public BaseMethodPointcut(CharSequence m, String[] p) {
         assert !Utils.isEmpty(m);
 
         methodName = m;
