@@ -23,45 +23,35 @@
     \  \:\        \  \:\        \  \:\        \  \::/       \  \:\
      \__\/         \__\/         \__\/         \__\/         \__\/
  *
- * Filename     @ Utils.java
- * Create date  @ 2021-12-22 15:47:51
+ * Filename     @ BaseMethodPointcut.java
+ * Create date  @ 2021-12-24 15:05:14
  * Description  @
  * version      @ V1.0.0
  */
 
 package peacemaker.frameworkinjector;
 
-public class Utils {
+public abstract class BaseMethodPointcut {
+    protected final String methodName;
+    protected final String[] paramTypes;
 
-    public static final String LOG_TAG = "frameworkinjector";
-
-    public static boolean isEmpty(CharSequence cs) {
-        return null == cs || 0 == cs.length();
+    public String getMethodName() {
+        return methodName;
     }
 
-    public static void message(String tag, String msg) {
-        assert msg != null;
-
-        final java.lang.StringBuilder sb = new StringBuilder("");
-        sb.append("" + tag + ":\t");
-        sb.append(msg);
-        System.out.println(sb.toString());
+    public String[] getParamTypes() {
+        return paramTypes;
     }
 
-    public static void fatal(String tag, String msg) throws FatalMessageException {
-        message(tag, msg);
-
-        throw new FatalMessageException("Stop with fatal: " + tag + " " + msg);
+    public BaseMethodPointcut(String m) {
+        this(m, null);
     }
 
-    public static void copyTo(String sourceFilePath, String to) throws java.io.IOException {
-        java.nio.file.Files.copy(new java.io.File(sourceFilePath).toPath(), new java.io.File(to).toPath());
-    }
+    public BaseMethodPointcut(String m, String[] p) {
+        assert !Utils.isEmpty(m);
 
-    public static class FatalMessageException extends IllegalStateException {
-        public FatalMessageException(String s) {
-            super(s);
-        }
+        methodName = m;
+        paramTypes = p;
     }
 }
 
