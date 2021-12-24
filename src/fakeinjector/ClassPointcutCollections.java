@@ -23,37 +23,63 @@
     \  \:\        \  \:\        \  \:\        \  \::/       \  \:\
      \__\/         \__\/         \__\/         \__\/         \__\/
  *
- * Filename     @ ClassMethodPointcut.java
- * Create date  @ 2021-12-24 15:17:27
- * Description  @
+ * Filename     @ ClassPointcutCollections.java
+ * Create date  @ 2021-12-24 16:40:00
+ * Description  @ ArrayList wrapper，存储的切点均属于同一个类。
  * version      @ V1.0.0
  */
 
 package peacemaker.frameworkinjector;
 
-public class ClassMethodPointcut extends BaseMethodPointcut {
-    protected final CharSequence className;
+public class ClassPointcutCollections<T extends BaseMethodPointcut> extends BasePointcutCollections<T>
+        implements BasePointcutCollections.Kitchen<T> {
+    private static final String TAG = ClassPointcutCollections.class.getSimpleName();
 
-    public CharSequence getClassName() {
-        return className;
+    private final CharSequence mClassName;
+
+    public ClassPointcutCollections(CharSequence clzName) {
+        super(new java.util.ArrayList<T>());
+
+        assert !Utils.isEmpty(clzName);
+        assert null != mPoints;
+
+        mClassName = clzName;
     }
 
     @Override
-    public CharSequence getStyledIdentifier() {
-        return className;
+    public boolean smellsGood(T element) {
+        assert null != element;
+
+        return mClassName.toString().equals(element.getStyledIdentifier());
     }
 
-    public ClassMethodPointcut(CharSequence c, CharSequence m) {
-        this(c, m, null);
+    @Override
+    public boolean ate(T element) {
+        assert null != element;
+
+        if (smellsGood(element)) {
+            addSilent(element);
+            return true;
+        }
+        return false;
     }
 
-    public ClassMethodPointcut(CharSequence c, CharSequence m, String[] p) {
-        super(m, p);
+    @Override
+    public boolean ate(java.util.List<T> elements) {
+        assert null != elements;
 
-        assert !Utils.isEmpty(c);
-        assert !Utils.isEmpty(m);
+        boolean ret = false;
 
-        className = c;
+        elements.forEach(element -> {
+            if (ate(element)) {
+                ret = true;
+            }
+        });
+
+        Utils.message(TAG, "" + mClassName + " with mPoints: " +
+                mPoints.size() + ": " + mPoints.toString());
+
+        return ret;
     }
 }
 
