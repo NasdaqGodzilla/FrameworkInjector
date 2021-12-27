@@ -46,12 +46,41 @@ public class PointcutCollectionsFactory implements Factory {
 
     @Override
     public BaseMethodPointcut retrieveMethodPointcut(CharSequence target) {
+        assert !Utils.isEmpty(target) : "Target is the target!";
+
+        final String clzName = "", methodName = "";
+        final String[] paramsType = new String[10];
+
+        Utils.parsePointcutInfo(target, (c, m, p) -> {
+            if (!Utils.isEmpty(c))
+                clzName.concat(c);
+            if (!Utils.isEmpty(m))
+                methodName.concat(m);
+            if (null != p && 0 < p.length)
+                System.arraycopy(p, 0, paramsType, 0, p.length); // FIXME: 优化实现；当前实现限制参数个数
+            Utils.message("TargetParse", String.format("Class: %s, Method: %s",
+                        c, m) + p);
+        });
+
+        if (!Utils.isEmpty(clzName)) {
+            return new ClassMethodPointcut(clzName, methodName, paramsType);
+        } else if (!Utils.isEmpty(methodName)) {
+            return new ClassMethodPointcut(Utils.通配符, methodName, paramsType);
+        }
+
         return null;
     }
 
     @Override
-    public java.util.List retrieveMethodPointcut(String[] target) {
-        return null;
+    public java.util.List retrieveMethodPointcut(String[] targets) {
+        assert null != targets;
+
+        final java.util.LinkedList ret = new java.util.LinkedList<BaseMethodPointcut>();
+        for (int i = 0; i < targets.length; ++i) {
+            ret.add(retrieveMethodPointcut(targets[i]));
+        }
+
+        return ret;
     }
 
     public static PointcutCollectionsFactory getOrCreate(CharSequence styledIdentifier) {
