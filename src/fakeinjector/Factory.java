@@ -37,6 +37,6 @@ public interface Factory {
     BaseMethodPointcut retrieveMethodPointcut(CharSequence target);
     java.util.List retrieveMethodPointcut(String[] targets);
     BasePointcutCollections add(BaseMethodPointcut e);
-    BasePointcutCollections add(BaseMethodPointcut[] e);
+    java.util.List add(java.util.List<BaseMethodPointcut> elements);
 }
 
