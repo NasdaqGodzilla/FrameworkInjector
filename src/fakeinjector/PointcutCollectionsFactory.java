@@ -32,16 +32,30 @@
 package peacemaker.frameworkinjector;
 
 public class PointcutCollectionsFactory implements Factory {
-    private PointcutCollectionsFactory() {}
+    private final PointcutCollectionsList mCollectionsList;
 
-    @Override
-    public BasePointcutCollections add(BaseMethodPointcut e) {
-        return null;
+    private PointcutCollectionsFactory() {
+        mCollectionsList = new PointcutCollectionsList();
     }
 
     @Override
-    public BasePointcutCollections add(BaseMethodPointcut[] e) {
-        return null;
+    public BasePointcutCollections add(BaseMethodPointcut e) {
+        assert null != e;
+
+        return mCollectionsList.add(e);
+    }
+
+    @Override
+    public java.util.List add(java.util.List<BaseMethodPointcut> elements) {
+        assert null != elements && 0 < elements.size();
+
+        final java.util.HashSet ret = new java.util.HashSet<BasePointcutCollections>();
+
+        elements.forEach(element -> {
+            ret.add(add(element));
+        });
+
+        return new java.util.LinkedList<>(ret);
     }
 
     @Override
