@@ -48,6 +48,22 @@ public class Utils {
     private static final String regex双分组 = String.format("(.*)%s(.*)%s(.*)", 分隔符, 分隔符);
     private static final String regex单分组 = String.format("(.*)%s(.*)", 分隔符);
 
+    private static final Pattern sPattern2;
+    private static final Pattern sPattern1;
+
+    static {
+        try {
+            sPattern2 = Pattern.compile(regex双分组);
+            sPattern1 = Pattern.compile(regex单分组);
+        } catch (PatternSyntaxException e) {
+            assert false : "Something went wrong. Check the pattern. " + e;
+        } finally {
+            Matcher m = sPattern2.matcher("ai.hello::12233::growth!");
+            if (!m.matches())
+                assert false : "It seems our patterns did not work correctly...";
+        }
+    }
+
     public static final boolean equals(CharSequence l, CharSequence r) {
         if (isEmpty(l) || isEmpty(r))
             assert false : "Catch u later";
