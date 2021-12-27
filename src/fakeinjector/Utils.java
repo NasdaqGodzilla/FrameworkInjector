@@ -48,13 +48,15 @@ public class Utils {
     private static final String regex双分组 = String.format("(.*)%s(.*)%s(.*)", 分隔符, 分隔符);
     private static final String regex单分组 = String.format("(.*)%s(.*)", 分隔符);
 
-    private static final Pattern sPattern2;
-    private static final Pattern sPattern1;
+    private static Pattern sPattern2;
+    private static Pattern sPattern1;
+    private static Pattern[] sPatterns;
 
     static {
         try {
             sPattern2 = Pattern.compile(regex双分组);
             sPattern1 = Pattern.compile(regex单分组);
+            sPatterns = new Pattern[] {sPattern2, sPattern1};
         } catch (PatternSyntaxException e) {
             assert false : "Something went wrong. Check the pattern. " + e;
         } finally {
@@ -84,28 +86,43 @@ public class Utils {
         assert !isEmpty(t) : "Target is the target!";
 
         final String target = t.toString().trim();
+        regexParse(target, cb);
+    }
 
+    private static void regexParse(String target, PointcutInfoParsedCallback cb) {
         String clzName = null, methodName = null;
         String[] paramsType = null;
 
         try {
-            
+            for (int i = 0; i < sPatterns.length; ++i) {
+                Pattern p = sPatterns[i];
+                Matcher m = p.matcher(target);
+                if (m.matches()) {
+                    switch (m.groupCount()) {
+                        case 3: {
+                            clzName = m.group(1);
+                            methodName = m.group(2);
+                            paramsType = new String[1]; // TODO: 还未设计多参数的表示方案，暂时将全部参数装入
+                            paramsType[0] = m.group(3);
+                        } break;
+                        case 2: {
+                            clzName = m.group(1);
+                            methodName = m.group(2);
+                        } break;
+                        case 1: {
+                            methodName = target;
+                        } break;
+                        default: {
+                            assert false : "Target is breaking against rules!";
+                        } break;
+                    }
+                    break;
+                }
+            }
         } finally {
-            // cb.callback(clzName, methodName, paramsType);
+            cb.callback(clzName, methodName, paramsType);
         }
     }
-
-    // private static void preParse(String target) {
-    
-    // }
-
-    // private static void regexParse(String target) {
-    
-    // }
-
-    // 匹配无分隔符：target声明为方法名
-    // 匹配单分隔符：target声明为无参数类方法：className::methodName
-    // 匹配双分隔符：target声明为带参数类方法：className::methodName::[]paramsType
 
     public static void message(String tag, String msg) {
         assert msg != null;
