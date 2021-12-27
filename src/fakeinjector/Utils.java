@@ -38,6 +38,7 @@ public class Utils {
     public static final String LOG_TAG = "frameworkinjector";
 
     public static final String 分隔符 = "::";
+    public static final String 通配符 = "@";
     public static final String 初始化方法表示 = "__init";
     public static final String 初始化方法 = "$init";
 
