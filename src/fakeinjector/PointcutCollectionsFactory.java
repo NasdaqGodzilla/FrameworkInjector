@@ -23,68 +23,48 @@
     \  \:\        \  \:\        \  \:\        \  \::/       \  \:\
      \__\/         \__\/         \__\/         \__\/         \__\/
  *
- * Filename     @ ClassPointcutCollections.java
- * Create date  @ 2021-12-24 16:40:00
- * Description  @ ArrayList wrapper，存储的切点均属于同一个类。
+ * Filename     @ PointcutCollectionsFactory.java
+ * Create date  @ 2021-12-25 10:20:11
+ * Description  @
  * version      @ V1.0.0
  */
 
 package peacemaker.frameworkinjector;
 
-public class ClassPointcutCollections<T extends BaseMethodPointcut> extends BasePointcutCollections<T>
-        implements BasePointcutCollections.Kitchen<T> {
-    private static final String TAG = ClassPointcutCollections.class.getSimpleName();
+public class PointcutCollectionsFactory implements Factory {
+    private PointcutCollectionsFactory() {}
 
-    private final CharSequence mClassName;
-
-    public ClassPointcutCollections(CharSequence clzName) {
-        super(new java.util.ArrayList<T>());
-
-        assert !Utils.isEmpty(clzName);
-        assert null != mPoints;
-
-        mClassName = clzName;
-    }
-
-    public final String getStyledIdentifier() {
-        return mClassName.toString();
+    @Override
+    public BasePointcutCollections add(BaseMethodPointcut e) {
+        return null;
     }
 
     @Override
-    public boolean smellsGood(T element) {
-        assert null != element;
-
-        return mClassName.toString().equals(element.getStyledIdentifier());
+    public BasePointcutCollections add(BaseMethodPointcut[] e) {
+        return null;
     }
 
     @Override
-    public boolean ate(T element) {
-        assert null != element;
-
-        if (smellsGood(element)) {
-            addSilent(element);
-            return true;
-        }
-        return false;
+    public BaseMethodPointcut retrieveMethodPointcut(CharSequence target) {
+        return null;
     }
 
     @Override
-    public boolean ate(java.util.List<T> elements) {
-        assert null != elements;
+    public java.util.List retrieveMethodPointcut(String[] target) {
+        return null;
+    }
 
-        boolean[] ret = new boolean[1];
-        ret[0] = false;
+    public static PointcutCollectionsFactory getOrCreate(CharSequence styledIdentifier) {
+        return get();
+    }
 
-        elements.forEach(element -> {
-            if (ate(element)) {
-                ret[0] = true;
-            }
-        });
+    public static PointcutCollectionsFactory get() {
+        return Instance.f;
+    }
 
-        Utils.message(TAG, "" + mClassName + " with mPoints: " +
-                mPoints.size() + ": " + mPoints.toString());
-
-        return ret[0];
+    private static class Instance {
+        private static final PointcutCollectionsFactory f =
+            new PointcutCollectionsFactory();
     }
 }
 

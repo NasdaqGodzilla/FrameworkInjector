@@ -23,52 +23,20 @@
     \  \:\        \  \:\        \  \:\        \  \::/       \  \:\
      \__\/         \__\/         \__\/         \__\/         \__\/
  *
- * Filename     @ Utils.java
- * Create date  @ 2021-12-22 15:47:51
+ * Filename     @ Factory.java
+ * Create date  @ 2021-12-25 10:20:11
  * Description  @
  * version      @ V1.0.0
  */
 
 package peacemaker.frameworkinjector;
 
-public class Utils {
-
-    public static final String LOG_TAG = "frameworkinjector";
-
-    public static final boolean equals(CharSequence l, CharSequence r) {
-        if (isEmpty(l) || isEmpty(r))
-            assert false : "Catch u later";
-
-        return l.toString().trim().equals(r.toString().trim());
-    }
-
-    public static boolean isEmpty(CharSequence cs) {
-        return null == cs || 0 == cs.length();
-    }
-
-    public static void message(String tag, String msg) {
-        assert msg != null;
-
-        final java.lang.StringBuilder sb = new StringBuilder("");
-        sb.append("" + tag + ":\t");
-        sb.append(msg);
-        System.out.println(sb.toString());
-    }
-
-    public static void fatal(String tag, String msg) throws FatalMessageException {
-        message(tag, msg);
-
-        throw new FatalMessageException("Stop with fatal: " + tag + " " + msg);
-    }
-
-    public static void copyTo(String sourceFilePath, String to) throws java.io.IOException {
-        java.nio.file.Files.copy(new java.io.File(sourceFilePath).toPath(), new java.io.File(to).toPath());
-    }
-
-    public static class FatalMessageException extends IllegalStateException {
-        public FatalMessageException(String s) {
-            super(s);
-        }
-    }
+public interface Factory {
+    static PointcutCollectionsList sPointcutCollectionsList = new PointcutCollectionsList();
+    default PointcutCollectionsList retrievePointcutCollectionsList() { return sPointcutCollectionsList; }
+    BaseMethodPointcut retrieveMethodPointcut(CharSequence target);
+    java.util.List retrieveMethodPointcut(String[] targets);
+    BasePointcutCollections add(BaseMethodPointcut e);
+    BasePointcutCollections add(BaseMethodPointcut[] e);
 }
 

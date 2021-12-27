@@ -23,68 +23,24 @@
     \  \:\        \  \:\        \  \:\        \  \::/       \  \:\
      \__\/         \__\/         \__\/         \__\/         \__\/
  *
- * Filename     @ ClassPointcutCollections.java
- * Create date  @ 2021-12-24 16:40:00
- * Description  @ ArrayList wrapper，存储的切点均属于同一个类。
+ * Filename     @ PointcutCollectionsList.java
+ * Create date  @ 2021-12-27 11:21:58
+ * Description  @
  * version      @ V1.0.0
  */
 
 package peacemaker.frameworkinjector;
 
-public class ClassPointcutCollections<T extends BaseMethodPointcut> extends BasePointcutCollections<T>
-        implements BasePointcutCollections.Kitchen<T> {
-    private static final String TAG = ClassPointcutCollections.class.getSimpleName();
-
-    private final CharSequence mClassName;
-
-    public ClassPointcutCollections(CharSequence clzName) {
-        super(new java.util.ArrayList<T>());
-
-        assert !Utils.isEmpty(clzName);
-        assert null != mPoints;
-
-        mClassName = clzName;
+public class PointcutCollectionsList extends java.util.LinkedList<BasePointcutCollections> {
+    public PointcutCollectionsList() {
+        super();
     }
 
-    public final String getStyledIdentifier() {
-        return mClassName.toString();
-    }
-
-    @Override
-    public boolean smellsGood(T element) {
-        assert null != element;
-
-        return mClassName.toString().equals(element.getStyledIdentifier());
-    }
-
-    @Override
-    public boolean ate(T element) {
-        assert null != element;
-
-        if (smellsGood(element)) {
-            addSilent(element);
-            return true;
-        }
+    public boolean containsStyledIdentifier(CharSequence identifier) {
+        for (BasePointcutCollections e : this)
+            if (Utils.equals(identifier, e.getStyledIdentifier()))
+                return true;
         return false;
-    }
-
-    @Override
-    public boolean ate(java.util.List<T> elements) {
-        assert null != elements;
-
-        boolean[] ret = new boolean[1];
-        ret[0] = false;
-
-        elements.forEach(element -> {
-            if (ate(element)) {
-                ret[0] = true;
-            }
-        });
-
-        Utils.message(TAG, "" + mClassName + " with mPoints: " +
-                mPoints.size() + ": " + mPoints.toString());
-
-        return ret[0];
     }
 }
 

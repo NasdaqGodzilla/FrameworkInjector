@@ -48,6 +48,12 @@ public abstract class BasePointcutCollections<E extends BaseMethodPointcut> {
         mPoints = c;
     }
 
+    public String getStyledIdentifier() {
+        assert false : "Code here would never run.";
+
+        return "";
+    }
+
     public java.util.AbstractCollection<E> getPoints() {
         return mPoints;
     }
