@@ -34,6 +34,7 @@ package peacemaker.frameworkinjector;
 public interface Factory {
     static PointcutCollectionsList sPointcutCollectionsList = new PointcutCollectionsList();
     default PointcutCollectionsList retrievePointcutCollectionsList() { return sPointcutCollectionsList; }
+    default void dump() {}
     BaseMethodPointcut retrieveMethodPointcut(CharSequence target);
     java.util.List retrieveMethodPointcut(String[] targets);
     BasePointcutCollections add(BaseMethodPointcut e);
