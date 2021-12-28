@@ -39,6 +39,7 @@ public class Utils {
 
     public static final String 分隔符 = "::";
     public static final String 通配符 = "@";
+    public static final String 逗号符 = ",";
     public static final String 初始化方法表示 = "__init";
     public static final String 初始化方法 = "$init";
 
@@ -76,6 +77,26 @@ public class Utils {
 
     public static boolean isEmpty(CharSequence cs) {
         return null == cs || 0 == cs.length();
+    }
+
+    public static void generateWorldThenDump(CharSequence targets) {
+        generateWorld(targets);
+        PointcutCollectionsFactory.get().dump();
+    }
+
+    public static void generateWorld(CharSequence t/*targets*/) {
+        assert !isEmpty(t) : "U are destroying the world!";
+
+        final String[] targets = t.toString().trim().split(逗号符);
+        final int targetCnt = targets.length;
+
+        assert 0 < targetCnt : "Invalid targets!";
+
+        message("generateWorld",
+                String.format("targets: %s; targetCnt: %d", t.toString(), targetCnt) + targets);
+
+        final Factory factory = PointcutCollectionsFactory.getOrCreate("");
+        factory.add(factory.retrieveMethodPointcut(targets));
     }
 
     @FunctionalInterface
