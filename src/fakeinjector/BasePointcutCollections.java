@@ -82,5 +82,7 @@ public abstract class BasePointcutCollections<E extends BaseMethodPointcut> {
     public final boolean contains(E e) throws java.lang.RuntimeException {
         return mPoints.contains(e);
     }
+
+    public abstract String dumpWorld();
 }
 

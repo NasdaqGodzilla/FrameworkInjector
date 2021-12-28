@@ -57,5 +57,7 @@ public abstract class BaseMethodPointcut {
         methodName = m;
         paramTypes = p;
     }
+
+    public abstract String dumpWorld();
 }
 

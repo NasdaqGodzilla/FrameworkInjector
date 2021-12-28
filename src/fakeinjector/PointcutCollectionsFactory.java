@@ -97,6 +97,21 @@ public class PointcutCollectionsFactory implements Factory {
         return ret;
     }
 
+    public void dump() {
+        Utils.message("dump", dumpWorld());
+    }
+
+    public String dumpWorld() {
+        final StringBuilder sb = new StringBuilder(getClass().getName());
+        sb.append(String.format("\r\n\tPointcutCollecetionsList size: %d",
+                    mCollectionsList.size()));
+        mCollectionsList.forEach(e -> {
+            sb.append("\r\n\t\t");
+            sb.append(e.dumpWorld());
+        });
+        return sb.toString();
+    }
+
     public static PointcutCollectionsFactory getOrCreate(CharSequence styledIdentifier) {
         return get();
     }
