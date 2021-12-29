@@ -79,6 +79,12 @@ public class Utils {
         return null == cs || 0 == cs.length();
     }
 
+    public static String[] getNonNullItems(String[] strArr) {
+        assert null != strArr && 0 < strArr.length;
+
+        return java.util.stream.Stream.of(strArr).filter(i -> !isEmpty(i)).toArray(String[]::new);
+    }
+
     public static void generateWorldThenDump(CharSequence targets) {
         generateWorld(targets);
         PointcutCollectionsFactory.get().dump();
