@@ -42,17 +42,23 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
-public class InjectEngine {
+public class InjectEngine implements AutoCloseable {
     private ZipFileWrapper mInJar;
     private Injector mInjector;
+    private PointcutCollectionsList mPointcutCollectionsList;
 
     public static class ZipFileWrapper extends ZipFile implements AutoCloseable {
-        public ZipFileWrapper(String file) {
+        public ZipFileWrapper(String file) throws IOException {
             super(file);
         }
 
         public BufferedInputStream getBufferedInputStreamForEntry(ZipEntry entry) {
-            return new BufferedInputStream(getInputStream(entry));
+            try {
+                return new BufferedInputStream(getInputStream(entry));
+            } catch (IOException e) {
+                Utils.fatal("ZipFileWrapper", "" + getName() + " failed open InputStream jar. " + e);
+            }
+            return null;
         }
 
         public Enumeration<? extends ZipEntry> getEntries() {
@@ -76,7 +82,7 @@ public class InjectEngine {
         private String mOutFile;
         private ZipOutputStream mOutputStream;
 
-        public Injector(String outFile) {
+        public Injector(String outFile) throws java.io.FileNotFoundException {
             mOutFile = outFile;
             mOutputStream = new ZipOutputStream(new FileOutputStream(outFile));
         }
@@ -93,10 +99,38 @@ public class InjectEngine {
         }
     }
 
-    public InjectEngine workOn(String inJar, String outJar) {
-        mInJar = new ZipFileWrapper(inJar);
-        mInjector = new Injector(outJar);
+    public InjectEngine powerOn(String inJar, String outJar, PointcutCollectionsList pointcuts) {
+        if (Utils.isEmpty(outJar) || Utils.isEmpty(inJar) || null == pointcuts || 0 >= pointcuts.size())
+            Utils.fatal("InjectEngine", "InjectEngine unavailable due to something crash down.");
+
+        workOn(inJar, outJar);
+        mPointcutCollectionsList = pointcuts;
         return this;
+    }
+
+    public InjectEngine powerOff() {
+        mInJar.close();
+        mInjector.close();
+
+        mInJar = null;
+        mInjector = null;
+        mPointcutCollectionsList = null;
+
+        return this;
+    }
+
+    private InjectEngine workOn(String inJar, String outJar) {
+        try {
+            mInJar = new ZipFileWrapper(inJar);
+            mInjector = new Injector(outJar);
+        } catch (IOException e) {
+            Utils.fatal("InjectEngine", "Failed ... " + e);
+        }
+        return this;
+    }
+
+    public static InjectEngine startEngine(String i, String o, PointcutCollectionsList l) {
+        return get().powerOn(i, o, l);
     }
 
     public static InjectEngine get() {
@@ -107,6 +141,11 @@ public class InjectEngine {
 
     private static class Instance {
         private static final InjectEngine i = new InjectEngine();
+    }
+
+    @Override
+    public void close() {
+        powerOff();
     }
 }
 
