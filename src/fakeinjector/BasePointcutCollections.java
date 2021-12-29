@@ -84,5 +84,7 @@ public abstract class BasePointcutCollections<E extends BaseMethodPointcut> {
     }
 
     public abstract String dumpWorld();
+
+    public abstract int getElementsCount();
 }
 

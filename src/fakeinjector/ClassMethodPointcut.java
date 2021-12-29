@@ -58,9 +58,10 @@ public class ClassMethodPointcut extends BaseMethodPointcut {
 
     @Override
     public String dumpWorld() {
-        final StringBuilder sb = new StringBuilder(getClass().getName());
-        sb.append(String.format("\r\n\tclassName: %s, methodName: %s",
-                    className, methodName) + paramTypes);
+        final StringBuilder sb = new StringBuilder("\t\t\t- " + getClass().getSimpleName());
+        sb.append(String.format("<%s>: ", getStyledIdentifier()));
+        sb.append(String.format("methodName: %s ", methodName) +
+                String.join(Utils.逗号符, Utils.getNonNullItems(paramTypes)));
         return sb.toString();
     }
 }

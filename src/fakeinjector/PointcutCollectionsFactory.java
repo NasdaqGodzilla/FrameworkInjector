@@ -83,7 +83,7 @@ public class PointcutCollectionsFactory implements Factory {
                 System.arraycopy(p, 0, targetInfo.paramsType, 0, p.length); // FIXME: 优化实现；当前实现限制参数个数
             Utils.message("TargetParse", String.format("Class: %s, Method: %s, Args: ",
                         targetInfo.clzName, targetInfo.methodName)
-                    + String.join(Utils.逗号符, targetInfo.paramsType));
+                    + String.join(Utils.逗号符, Utils.getNonNullItems(targetInfo.paramsType)));
         });
 
         if (!Utils.isEmpty(targetInfo.clzName)) {
@@ -115,13 +115,21 @@ public class PointcutCollectionsFactory implements Factory {
 
     public String dumpWorld() {
         final StringBuilder sb = new StringBuilder(getClass().getName());
-        sb.append(String.format("\r\n\tPointcutCollecetionsList size: %d",
-                    mCollectionsList.size()));
+        sb.append(String.format("\tPointcutCollecetionsList Collections.size: %d, Pointcuts.size: %d",
+                    mCollectionsList.size(), getElementsCount()));
         mCollectionsList.forEach(e -> {
             sb.append("\r\n\t\t");
             sb.append(e.dumpWorld());
         });
         return sb.toString();
+    }
+
+    public int getElementsCount() {
+        int[] ret = {0};
+        mCollectionsList.forEach(e -> {
+            ret[0] += e.getElementsCount();
+        });
+        return ret[0];
     }
 
     public static PointcutCollectionsFactory getOrCreate(CharSequence styledIdentifier) {
