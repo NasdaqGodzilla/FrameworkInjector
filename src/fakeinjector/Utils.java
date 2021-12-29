@@ -93,7 +93,7 @@ public class Utils {
         assert 0 < targetCnt : "Invalid targets!";
 
         message("generateWorld",
-                String.format("targets: %s; targetCnt: %d", t.toString(), targetCnt) + targets);
+                String.format("targets: %s; targetCnt: %d", t.toString(), targetCnt));
 
         final Factory factory = PointcutCollectionsFactory.getOrCreate("");
         factory.add(factory.retrieveMethodPointcut(targets));

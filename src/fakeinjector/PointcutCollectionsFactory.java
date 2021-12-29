@@ -62,25 +62,37 @@ public class PointcutCollectionsFactory implements Factory {
     public BaseMethodPointcut retrieveMethodPointcut(CharSequence target) {
         assert !Utils.isEmpty(target) : "Target is the target!";
 
-        final String clzName = "", methodName = "";
-        final String[] paramsType = new String[10];
+        class TargetInfo {
+            public String clzName;
+            public String methodName;
+            public String[] paramsType;
+
+            public TargetInfo() {
+                paramsType = new String[10]; // TODO: 解决参数个数限制
+            }
+        }
+
+        final TargetInfo targetInfo = new TargetInfo();
 
         Utils.parsePointcutInfo(target, (c, m, p) -> {
             if (!Utils.isEmpty(c))
-                clzName.concat(c);
+                targetInfo.clzName = c;
             if (!Utils.isEmpty(m))
-                methodName.concat(m);
+                targetInfo.methodName = m;
             if (null != p && 0 < p.length)
-                System.arraycopy(p, 0, paramsType, 0, p.length); // FIXME: 优化实现；当前实现限制参数个数
-            Utils.message("TargetParse", String.format("Class: %s, Method: %s",
-                        c, m) + p);
+                System.arraycopy(p, 0, targetInfo.paramsType, 0, p.length); // FIXME: 优化实现；当前实现限制参数个数
+            Utils.message("TargetParse", String.format("Class: %s, Method: %s, Args: ",
+                        targetInfo.clzName, targetInfo.methodName)
+                    + String.join(Utils.逗号符, targetInfo.paramsType));
         });
 
-        if (!Utils.isEmpty(clzName)) {
-            return new ClassMethodPointcut(clzName, methodName, paramsType);
-        } else if (!Utils.isEmpty(methodName)) {
-            return new ClassMethodPointcut(Utils.通配符, methodName, paramsType);
+        if (!Utils.isEmpty(targetInfo.clzName)) {
+            return new ClassMethodPointcut(targetInfo.clzName, targetInfo.methodName, targetInfo.paramsType);
+        } else if (!Utils.isEmpty(targetInfo.methodName)) {
+            return new ClassMethodPointcut(Utils.通配符, targetInfo.methodName, targetInfo.paramsType);
         }
+
+        Utils.fatal("TargetParse", "Something went wrong: " + target);
 
         return null;
     }
