@@ -89,14 +89,20 @@ public class ClassPointcutCollections<T extends BaseMethodPointcut> extends Base
 
     @Override
     public String dumpWorld() {
-        final StringBuilder sb = new StringBuilder(getClass().getName());
-        sb.append(String.format("\r\n ClassPointcutCollections mPoints size: %d",
+        final StringBuilder sb = new StringBuilder("[X] " + getClass().getSimpleName());
+        sb.append(String.format("<%s>:", getStyledIdentifier()));
+        sb.append(String.format(" size: %d",
                     mPoints.size()));
         mPoints.forEach(e -> {
             sb.append("\r\n");
             sb.append(e.dumpWorld());
         });
         return sb.toString();
+    }
+
+    @Override
+    public int getElementsCount() {
+        return mPoints.size();
     }
 }
 
