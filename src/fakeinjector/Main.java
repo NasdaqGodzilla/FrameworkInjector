@@ -57,6 +57,8 @@ public class Main {
                 " pointcuts: " + pointcuts);
         Utils.message("frameworkinjector", exp);
 
+        Utils.generateWorldThenDump(pointcuts);
+
         try {
             Utils.copyTo(inJar, outJar);
         } catch (java.io.IOException e) {
