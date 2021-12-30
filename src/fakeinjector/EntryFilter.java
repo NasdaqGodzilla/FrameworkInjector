@@ -35,6 +35,6 @@ package peacemaker.frameworkinjector;
 import java.util.zip.ZipEntry;
 
 @FunctionalInterface
-public interface EntryFilter<T extends ZipEntry> extends java.util.function.Predicate<T> {
+public interface EntryFilter<T extends ZipEntry> extends java.util.function.Predicate<ZipEntry> {
 }
 
