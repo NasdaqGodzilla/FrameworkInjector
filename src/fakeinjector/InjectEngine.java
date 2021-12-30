@@ -65,17 +65,50 @@ public class InjectEngine implements AutoCloseable {
             return entries();
         }
 
-        public void <T extends ZipEntry> forEachEntry(EntryConsumer<T> entryConsumer) {
+        public void forEachEntry(EntryConsumer<? extends ZipEntry, BufferedInputStream> entryConsumer) {
             if (null == entryConsumer)
                 Utils.fatal("ZipFileWrapper", "Happy Christmas!");
 
-            return forEachEntryWithFilter("", null, entryConsumer);
+            forEachEntryWithFilter("", null, entryConsumer, null);
         }
 
-        public void <T extends ZipEntry> forEachEntryWithFilter(String entryType,
-                    EntryFilter<T> entryFilter, EntryConsumer<T> entryConsumer) {
+        /**
+         * @author: Niko
+         * @description: 遍历jar包，通过Consumer逐个返回指定后缀的且EntryFilter验证通过的entry
+         * @param:  entryType 后缀；要求首字符必须是'.' String.startsWith('.')返回true; 或以空串表示接收所有
+         * @param:  entryFilter 调用者实现的该接口返回flase时不通过entryConsumer返回entry
+         * @param:  entryConsumer 向调用者逐个返回entry的接口
+         * @param:  unmatchedConsumer 调用者实现该接口可以接收到不匹配的entry
+         * @return: void
+         */
+        public void forEachEntryWithFilter(String entryType,
+                    EntryFilter<? extends ZipEntry> entryFilter, EntryConsumer<? extends ZipEntry, BufferedInputStream> entryConsumer,
+                    EntryConsumer<? extends ZipEntry, BufferedInputStream> unmatchedConsumer) {
             if (null == entryConsumer)
                 Utils.fatal("ZipFileWrapper", "Happy New Year!");
+
+            Utils.message("ZipFileWrapper",
+                        String.format("%s: forEachEntryWithFilter entryType: %s entryFilter-entryConsumer: ") +
+                    entryFilter + " " + entryConsumer);
+
+            final boolean entryTypeAll = Utils.isEmpty(entryType);
+            final boolean entryFilterAll = null == entryFilter;
+
+            final Enumeration<? extends ZipEntry> entries = getEntries();
+            while (entries.hasMoreElements()) {
+                final ZipEntry entry = entries.nextElement();
+                final ZipEntry retEntry = new ZipEntry(entry.getName());
+                final BufferedInputStream retEntryBis = getBufferedInputStreamForEntry(entry);
+
+                final boolean entryTypeMatched = entryTypeAll || entry.getName().endsWith(entryType);
+                final boolean entryFilterMatched = entryFilterAll || entryFilter.test(entry);
+
+                if (entryTypeMatched && entryFilterMatched) {
+                    entryConsumer.accept(retEntry, retEntryBis);
+                } else if (null != unmatchedConsumer) {
+                    unmatchedConsumer.accept(retEntry, retEntryBis);
+                } else { /* Unmatched and unhandled */ }
+            }
         }
 
         @Override
