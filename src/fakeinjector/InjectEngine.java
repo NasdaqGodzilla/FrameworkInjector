@@ -154,8 +154,11 @@ public class InjectEngine implements AutoCloseable {
         Utils.message(TAG, String.format("<%s> powerOn.",
                     Integer.toHexString(System.identityHashCode(this))));
 
-        if (Utils.isEmpty(outJar) || Utils.isEmpty(inJar) || null == pointcuts || 0 >= pointcuts.size())
+        if (Utils.isEmpty(outJar) || Utils.isEmpty(inJar))
             Utils.fatal(TAG, "InjectEngine unavailable due to something crash down.");
+
+        if (null == pointcuts || 0 >= pointcuts.size())
+            Utils.message(TAG, "InjectEngine working with empty PointcutsCollectionsList.");
 
         workOn(inJar, outJar);
         mPointcutCollectionsList = pointcuts;
