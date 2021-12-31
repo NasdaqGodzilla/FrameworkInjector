@@ -90,7 +90,8 @@ public class InjectEngine implements AutoCloseable {
                 Utils.fatal("ZipFileWrapper", "Happy New Year!");
 
             Utils.message("ZipFileWrapper",
-                        String.format("%s: forEachEntryWithFilter entryType: %s entryFilter-entryConsumer: ") +
+                        String.format("%s: forEachEntryWithFilter entryType: %s entryFilter-entryConsumer: ",
+                            getName(), entryType) +
                     entryFilter + " " + entryConsumer);
 
             final boolean entryTypeAll = Utils.isEmpty(entryType);
