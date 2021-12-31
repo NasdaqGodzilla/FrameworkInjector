@@ -152,6 +152,25 @@ public class Utils {
         }
     }
 
+    public static void startInjectAsCopy(String copyFrom, String copyTo) throws java.io.IOException {
+        startInjectWithConsumer(copyFrom, copyTo,
+                new EntryCopyConsumer(new java.util.zip.ZipOutputStream(new java.io.FileOutputStream(copyTo))));
+    }
+
+    public static void startInjectWithConsumer(String inJar, String outJar, EntryConsumer targetConsumer) {
+        startInjectWithConsumer(inJar, outJar, null, null, targetConsumer, null);
+    }
+
+    public static void startInjectWithConsumer(String inJar, String outJar, PointcutCollectionsList pointcutList,
+            EntryFilter filter, EntryConsumer targetConsumer, EntryConsumer otherConsumer) {
+        try (final InjectEngine injectEngine = InjectEngine.startEngine(inJar, outJar, pointcutList)) {
+            final InjectEngine.Injector injector = injectEngine.retrieveInjector();
+            injector.performInject(injectEngine.retrieveInJar(), pointcutList, filter, targetConsumer, otherConsumer);
+        } finally {
+            message("startInjectWithConsumer", "finally finished.");
+        }
+    }
+
     public static void message(String tag, String msg) {
         assert msg != null;
 

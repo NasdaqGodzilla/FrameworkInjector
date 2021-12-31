@@ -43,6 +43,8 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 public class InjectEngine implements AutoCloseable {
+    private static final String TAG = InjectEngine.class.getSimpleName();
+
     private ZipFileWrapper mInJar;
     private Injector mInjector;
     private PointcutCollectionsList mPointcutCollectionsList;
@@ -122,13 +124,18 @@ public class InjectEngine implements AutoCloseable {
         }
     }
 
-    private static class Injector implements AutoCloseable {
+    public static class Injector implements AutoCloseable {
         private String mOutFile;
         private ZipOutputStream mOutputStream;
 
         public Injector(String outFile) throws java.io.FileNotFoundException {
             mOutFile = outFile;
             mOutputStream = new ZipOutputStream(new FileOutputStream(outFile));
+        }
+
+        public void performInject(ZipFileWrapper inJar, PointcutCollectionsList list, EntryFilter filter,
+                EntryConsumer targetConsumer, EntryConsumer otherConsumer) {
+            inJar.forEachEntryWithFilter(".class", filter, targetConsumer, otherConsumer);
         }
 
         @Override
@@ -144,8 +151,11 @@ public class InjectEngine implements AutoCloseable {
     }
 
     public InjectEngine powerOn(String inJar, String outJar, PointcutCollectionsList pointcuts) {
+        Utils.message(TAG, String.format("<%s> powerOn.",
+                    Integer.toHexString(System.identityHashCode(this))));
+
         if (Utils.isEmpty(outJar) || Utils.isEmpty(inJar) || null == pointcuts || 0 >= pointcuts.size())
-            Utils.fatal("InjectEngine", "InjectEngine unavailable due to something crash down.");
+            Utils.fatal(TAG, "InjectEngine unavailable due to something crash down.");
 
         workOn(inJar, outJar);
         mPointcutCollectionsList = pointcuts;
@@ -153,6 +163,9 @@ public class InjectEngine implements AutoCloseable {
     }
 
     public InjectEngine powerOff() {
+        Utils.message(TAG, String.format("<%s> powerOff.",
+                    Integer.toHexString(System.identityHashCode(this))));
+
         mInJar.close();
         mInjector.close();
 
@@ -168,9 +181,17 @@ public class InjectEngine implements AutoCloseable {
             mInJar = new ZipFileWrapper(inJar);
             mInjector = new Injector(outJar);
         } catch (IOException e) {
-            Utils.fatal("InjectEngine", "Failed ... " + e);
+            Utils.fatal(TAG, "Failed ... " + e);
         }
         return this;
+    }
+
+    public ZipFileWrapper retrieveInJar() {
+        return mInJar;
+    }
+
+    public Injector retrieveInjector() {
+        return mInjector;
     }
 
     public static InjectEngine startEngine(String i, String o, PointcutCollectionsList l) {
