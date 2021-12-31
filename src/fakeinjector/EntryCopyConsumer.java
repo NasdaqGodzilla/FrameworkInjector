@@ -49,8 +49,8 @@ public class EntryCopyConsumer implements AutoCloseable, EntryConsumer<ZipEntry,
     public void accept(ZipEntry newEntry, BufferedInputStream newEntryBis) {
         final ZipOutputStream zos = mWeakZos.get();
 
-        Utils.message(TAG, String.format("<%d> accept %s copying to output ",
-                    System.identityHashCode(this), newEntry.getName())
+        Utils.message(TAG, String.format("<%s> accept %s copying to output ",
+                    Integer.toHexString(System.identityHashCode(this)), newEntry.getName())
                 + zos);
 
         boolean crash = true;
@@ -66,8 +66,8 @@ public class EntryCopyConsumer implements AutoCloseable, EntryConsumer<ZipEntry,
             Utils.fatal(TAG, "" + e);
         } finally {
             if (crash)
-                Utils.fatal(TAG, String.format("<%d> accept %s something went wrong",
-                            System.identityHashCode(this), newEntry.getName()));
+                Utils.fatal(TAG, String.format("<%s> accept %s something went wrong",
+                            Integer.toHexString(System.identityHashCode(this)), newEntry.getName()));
         }
     }
 
