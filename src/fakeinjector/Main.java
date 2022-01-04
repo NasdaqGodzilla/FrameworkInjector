@@ -60,6 +60,12 @@ public class Main {
         Utils.generateWorldThenDump(pointcuts);
 
         try {
+            Utils.startInjectAsFilter(inJar,
+                    new EntryMatchFilter(PointcutCollectionsFactory.get().retrievePointcutCollectionsList()),
+                    (e, s) ->
+                        Utils.message("Main.startInjectAsFilter", "接收到匹配项: " + ((java.util.zip.ZipEntry) e).getName()),
+                        null);
+
             Utils.startInjectAsCopy(inJar, outJar);
         } catch (java.io.IOException e) {
             Utils.fatal("frameworkinjector", "" + e);
