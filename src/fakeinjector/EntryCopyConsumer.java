@@ -34,6 +34,7 @@ package peacemaker.frameworkinjector;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -41,13 +42,32 @@ public class EntryCopyConsumer implements AutoCloseable, EntryConsumer<ZipEntry,
     private final String TAG = EntryCopyConsumer.class.getSimpleName();
     private final java.lang.ref.WeakReference<ZipOutputStream> mWeakZos;
 
+    // TODO: 需要重新实现ZipOutputStream的获取方式
+    // INFO: 初始化目前传入null，原因是InjectorEngine会执行对zos的初始化，这里如果初始化会造成重复初始化。
     public EntryCopyConsumer(ZipOutputStream zos) {
-        mWeakZos = new java.lang.ref.WeakReference<ZipOutputStream>(zos);
+        ZipOutputStream newZos = zos;
+        if (null == newZos)
+            newZos = InjectEngine.get().retrieveInjectorOutputStream();
+
+        if (null == newZos)
+            Utils.message(TAG, "Output stream from injector require NonNull. (Lateinit...will retry later.)");
+
+        mWeakZos = new java.lang.ref.WeakReference<ZipOutputStream>(newZos);
     }
 
     @Override
     public void accept(ZipEntry newEntry, BufferedInputStream newEntryBis) {
-        final ZipOutputStream zos = mWeakZos.get();
+        final ZipOutputStream zos;
+        if (null != mWeakZos.get())
+            zos = mWeakZos.get();
+        else {
+            zos = InjectEngine.get().retrieveInjectorOutputStream();
+            // mWeakZos.refersTo(zos); // AOSP 10.0.0-r1 没有refersTo接口
+        }
+
+        if (null == zos)
+            Utils.fatal(TAG, "Output stream from injector require NonNUll.");
+
 
         Utils.message(TAG, String.format("<%s> accept %s copying to output ",
                     Integer.toHexString(System.identityHashCode(this)), newEntry.getName())
