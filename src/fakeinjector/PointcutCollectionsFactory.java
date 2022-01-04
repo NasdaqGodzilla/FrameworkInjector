@@ -132,6 +132,10 @@ public class PointcutCollectionsFactory implements Factory {
         return ret[0];
     }
 
+    public PointcutCollectionsList retrievePointcutCollectionsList() {
+        return mCollectionsList;
+    }
+
     public static PointcutCollectionsFactory getOrCreate(CharSequence styledIdentifier) {
         return get();
     }

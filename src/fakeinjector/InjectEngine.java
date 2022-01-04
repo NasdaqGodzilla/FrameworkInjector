@@ -151,6 +151,30 @@ public class InjectEngine implements AutoCloseable {
         }
     }
 
+    public InjectEngine workOnFilterModeOnce(String inJar, EntryFilter filter, EntryConsumer match, EntryConsumer other) throws IOException {
+        if (Utils.isEmpty(inJar) || null == match || null == filter)
+            Utils.fatal(TAG, "ACCESS DENIED! Hurtful parameters!");
+
+        /*
+        if (null != mInJar || null != mInjector) { // InjectEngine still power ON. Something is still working which may not well to interrupt.
+            Utils.message(TAG, "workOnFilterMode may interrupt other routine which may run into bad ways.");
+            powerOff();
+        }
+        */
+
+        Utils.message(TAG, String.format("workOnFilterMode start %s", inJar));
+
+        // try (mInJar = new ZipFileWrapper(inJar)) { // Assign mInJar is announce that we're using InjectEngine. There have messages when we were interrupted.
+        try (final ZipFileWrapper jarFile = new ZipFileWrapper(inJar)) {
+            jarFile.forEachEntryWithFilter(".class", filter, match, other);
+        }
+
+        Utils.message(TAG, String.format("workOnFilterMode quit %s", inJar));
+        // mInJar = null;
+
+        return this;
+    }
+
     public InjectEngine powerOn(String inJar, String outJar, PointcutCollectionsList pointcuts) {
         Utils.message(TAG, String.format("<%s> powerOn.",
                     Integer.toHexString(System.identityHashCode(this))));
@@ -166,12 +190,15 @@ public class InjectEngine implements AutoCloseable {
         return this;
     }
 
-    public InjectEngine powerOff() {
+    public InjectEngine powerOff() /* throws */ {
         Utils.message(TAG, String.format("<%s> powerOff.",
                     Integer.toHexString(System.identityHashCode(this))));
 
-        mInJar.close();
-        mInjector.close();
+        if (null != mInJar)
+            mInJar.close();
+
+        if (null != mInjector)
+            mInjector.close();
 
         mInJar = null;
         mInjector = null;
@@ -181,6 +208,11 @@ public class InjectEngine implements AutoCloseable {
     }
 
     private InjectEngine workOn(String inJar, String outJar) {
+        if (null != mInJar || null != mInjector) {
+            Utils.message(TAG, "workOn: It seems that something eariler jobs does not finished.");
+            powerOff(); // Call it will cause crash(double close) maybe. On the contrary, will cause resources leak maybe.
+        }
+
         try {
             mInJar = new ZipFileWrapper(inJar);
             mInjector = new Injector(outJar);
