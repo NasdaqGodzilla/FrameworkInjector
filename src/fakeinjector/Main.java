@@ -60,10 +60,18 @@ public class Main {
         Utils.generateWorldThenDump(pointcuts);
 
         try {
+            Utils.startInjectAsCopy(inJar, outJar);
+        } catch (java.io.IOException e) {
+            Utils.fatal("fakeinjector", "" + e);
+        }
+
+        /*
+        try {
             Utils.copyTo(inJar, outJar);
         } catch (java.io.IOException e) {
             Utils.fatal("frameworkinjector", "" + e);
         }
+        */
     }
 
     public static class EarlyExitException extends RuntimeException {
