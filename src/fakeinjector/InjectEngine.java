@@ -198,6 +198,13 @@ public class InjectEngine implements AutoCloseable {
         return mInjector;
     }
 
+    public ZipOutputStream retrieveInjectorOutputStream() {
+        if (null != mInjector)
+            return mInjector.mOutputStream;
+
+        return null;
+    }
+
     public static InjectEngine startEngine(String i, String o, PointcutCollectionsList l) {
         return get().powerOn(i, o, l);
     }

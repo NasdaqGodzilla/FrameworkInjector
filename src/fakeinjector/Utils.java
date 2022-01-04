@@ -153,8 +153,8 @@ public class Utils {
     }
 
     public static void startInjectAsCopy(String copyFrom, String copyTo) throws java.io.IOException {
-        startInjectWithConsumer(copyFrom, copyTo,
-                new EntryCopyConsumer(new java.util.zip.ZipOutputStream(new java.io.FileOutputStream(copyTo))));
+        startInjectWithConsumer(copyFrom, copyTo, new EntryCopyConsumer(null));
+                // new EntryCopyConsumer(new java.util.zip.ZipOutputStream(new java.io.FileOutputStream(copyTo))));
     }
 
     public static void startInjectWithConsumer(String inJar, String outJar, EntryConsumer targetConsumer) {
