@@ -152,6 +152,20 @@ public class Utils {
         }
     }
 
+    // 催动InjectEngine仅工作为filter模式，Injector将inJar内符合filter的entry返回，提供otherConsumer时额外返回剩余的entry
+    // 通常情况下用于测试filter及其上下游是否正常工作，不会触发InjectEngine.powerOn()，这表明InjectEngine不产出产物
+    public static void startInjectAsFilter(String inJar, EntryFilter filter, EntryConsumer matchConsumer,
+            EntryConsumer otherConsumer) throws java.io.IOException {
+        if (isEmpty(inJar) || null == filter || null == matchConsumer)
+            fatal("startInjectAsFilter", "Fine... Call me a quitter. I QUIT! Not to be rude at all.");
+
+        try (final InjectEngine injectEngine = InjectEngine.get()) {
+            injectEngine.workOnFilterModeOnce(inJar, filter, matchConsumer, otherConsumer);
+        } finally {
+            message("startInjectAsFilter", "finally finished.");
+        }
+    }
+
     public static void startInjectAsCopy(String copyFrom, String copyTo) throws java.io.IOException {
         startInjectWithConsumer(copyFrom, copyTo, new EntryCopyConsumer(null));
                 // new EntryCopyConsumer(new java.util.zip.ZipOutputStream(new java.io.FileOutputStream(copyTo))));

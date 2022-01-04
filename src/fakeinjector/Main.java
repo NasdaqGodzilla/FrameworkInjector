@@ -62,7 +62,7 @@ public class Main {
         try {
             Utils.startInjectAsCopy(inJar, outJar);
         } catch (java.io.IOException e) {
-            Utils.fatal("fakeinjector", "" + e);
+            Utils.fatal("frameworkinjector", "" + e);
         }
 
         /*
