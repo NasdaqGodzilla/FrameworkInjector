@@ -37,6 +37,7 @@ public class Utils {
 
     public static final String LOG_TAG = "frameworkinjector";
 
+    // 命令参数：-pointcuts com.example.ClassName::methodName::args ...
     public static final String 分隔符 = "::";
     public static final String 通配符 = "@";
     public static final String 逗号符 = ",";

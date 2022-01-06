@@ -65,6 +65,8 @@ class SpecFormatter {
     // static final String sRegexMatchFullClassNameSlash = "^([a-zA-Z]+[/][a-zA-Z]+)[.]*.*"; // 同上，通过SLASH分隔
     private static final String sRegexMatchFullClassName = "^([a-zA-Z]+(?<split>[.|/])[a-zA-Z]+)\\k<split>*.*";
 
+    // TODO: 支持从fullClassName获取simpleName methodName
+
     private static Pattern sPatternFullClassName;
 
     static {
@@ -80,6 +82,10 @@ class SpecFormatter {
 
     private ClassMethodSignatureBean signBean;
 
+    public ClassMethodSignatureBean retrieveSignatureBean() {
+        return signBean;
+    }
+
     public SpecFormatter() {}
 
     static SpecFormatter with(ClassMethodSignatureBean b) {
@@ -88,49 +94,99 @@ class SpecFormatter {
         return sf;
     }
 
-    public boolean isInnerClass() {
+    static SpecFormatter with(String fullClassNameWithSplash) {
+        return with(new ClassMethodSignatureBean(null, null, fullClassNameWithSplash));
+    }
+
+    boolean isInnerClass() {
         return !isOuterClass();
     }
 
-    public static boolean isInnerClass(String s) {
+    static boolean isInnerClass(String s) {
         return !isOuterClass(s);
     }
 
     // INFO: 不可靠，因为部分框架/编码/库会出现使用DOLLAR进行命名的情况，对于Java规范来说是合法的，但对包含本方法在内的语义分析器是有毒的。
-    public boolean isOuterClass() {
+    boolean isOuterClass() {
         return isOuterClass(signBean.getFullClassName());
     }
 
-    public static boolean isOuterClass(String s) {
+    static boolean isOuterClass(String s) {
         return isValidFullName(s) && !s.contains(DOLLAR);
     }
 
-    public boolean isValidFullName() {
+    boolean isValidFullName() {
         return isValidFullName(signBean.getFullClassName());
     }
 
-    public static boolean isValidFullName(String s) {
+    static boolean isValidFullName(String s) {
         return sPatternFullClassName.matcher(s).matches();
     }
 
-    public boolean isSplitByPoint() {
+    boolean isSplitByPoint() {
         return isSplitByPoint(signBean.getFullClassName());
     }
 
-    public static boolean isSplitByPoint(String s) {
+    static boolean isSplitByPoint(String s) {
         return isValidFullName(s) && !s.contains(SLASH);
     }
 
-    public boolean isSplitBySlash() {
+    boolean isSplitBySlash() {
         return !isSplitByPoint();
     }
 
-    public static boolean isSplitBySlash(String s) {
+    static boolean isSplitBySlash(String s) {
         return !isSplitBySlash(s);
     }
 
-    // TODO: 正则转换为点分表达，参数控制保留$
-    // TODO: 正则转换为杠分表达，参数控制保留$
-    // TODO: 生成Jar包ZipEntry风格的entryName: com/niko/example/ClazzName$Inner.class
+    // 获得com.niko.example.ClassName$Inner
+    String retrieveWithPoint() {
+        // if (isSplitByPoint())
+            // return signBean.getFullClassName(); // fullClassName是com/niko/ClassA$1
+
+        if (Utils.isEmpty(signBean.getClassNameWithPoint())) {
+            signBean.setClassNameWithPoint(
+                    retrieveWithPoint(signBean.getFullClassName()));
+        }
+
+        return signBean.getClassNameWithPoint();
+    }
+
+    static String retrieveWithPoint(String s) {
+        return s.replaceAll(SLASH, POINT);
+    }
+
+    String retrieveWithSlash() {
+        return signBean.getFullClassName();
+    }
+
+    static String retrieveWithSlash(String s) {
+        return s.replaceAll(POINT, SLASH);
+    }
+
+    // 替换$
+    String retrieveInnerSpecAs(String to) {
+        return retrieveInnerSpecAs(signBean.getFullClassName(), to);
+    }
+
+    static String retrieveInnerSpecAs(String full, String to) {
+        return full.replaceAll(DOLLAR, to);
+    }
+
+    // 生成Jar包ZipEntry风格的entryName: com/niko/example/ClazzName$Inner.class
+    String retrieveEntryName() {
+        return retrieveEntryName(signBean.getFullClassName());
+    }
+
+    static String retrieveEntryName(String s) {
+        return s + ".class";
+    }
+
+    static String retrieveEntryNameWithoutSuffix(String s) {
+        if (s.endWith(".class"))
+            return s.substring(0, s.length() - 6);
+
+        return s;
+    }
 }
 

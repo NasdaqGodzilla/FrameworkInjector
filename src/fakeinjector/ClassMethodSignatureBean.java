@@ -38,7 +38,7 @@ public class ClassMethodSignatureBean implements java.io.Serializable {
     // TODO: 添加参数列表
 
     private transient String classNameWithPoint; // Full class path shown with splitor '.'
-    private transient String classNameWithSlash; // Splitor is '/'
+    private transient String classNameWithSlash; // Splitor is '/', exclude inner class.
 
     public ClassMethodSignatureBean() {}
 
