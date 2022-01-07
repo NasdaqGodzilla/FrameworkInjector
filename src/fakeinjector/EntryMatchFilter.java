@@ -43,19 +43,33 @@ public class EntryMatchFilter implements EntryFilter<ZipEntry> {
     }
 
     private boolean matched(String s) {
-        return mWeakList.get().containsStyledIdentifier(s);
+        // Skip directories
+        if (!s.endsWith(".class"))
+            return false;
+
+        final SpecFormatter sf =
+            SpecFormatter.with(SpecFormatter.retrieveEntryNameWithoutSuffix(s));
+        final String classFullNamePoint =
+            sf.retrieveInnerSpecAs(sf.retrieveWithPoint(), ".");
+
+        return mWeakList.get().containsStyledIdentifier(classFullNamePoint);
     }
 
     private void message(String m) {
         Utils.message(TAG, m);
     }
 
+    // What does ZipEntry looks like? By ZipEntry.getName() called:
+    // com/android/server/wm/ActivityTaskManagerService$Lifecycle.class
+    // com/android/server/wm/WindowState$PowerManagerWrapper.class
     @Override
     public boolean test(ZipEntry t) {
-        message(String.format("%s matched: %b",
-                    t.getName(), matched(t.getName())));
+        final boolean matched = matched(t.getName().trim());
 
-        return null != t;
+        if (matched)
+            message(String.format("%s matched.", t.getName()));
+
+        return matched;
     }
 }
 
