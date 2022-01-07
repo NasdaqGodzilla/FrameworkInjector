@@ -183,7 +183,7 @@ class SpecFormatter {
     }
 
     static String retrieveEntryNameWithoutSuffix(String s) {
-        if (s.endWith(".class"))
+        if (s.endsWith(".class"))
             return s.substring(0, s.length() - 6);
 
         return s;
