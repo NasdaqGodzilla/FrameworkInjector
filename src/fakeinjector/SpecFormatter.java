@@ -54,6 +54,7 @@ class SpecFormatter {
     static final String SLASH = java.io.File.separator;
     static final String POINT = ".";
     static final String DOLLAR = "$";
+    static final String REGEX_DOLLAR = "\\$";
     static final String SHARP = "#";
 
     // Regex expresion to match class full name.
@@ -170,7 +171,7 @@ class SpecFormatter {
     }
 
     static String retrieveInnerSpecAs(String full, String to) {
-        return full.replaceAll(DOLLAR, to);
+        return full.replaceAll(REGEX_DOLLAR, to);
     }
 
     // 生成Jar包ZipEntry风格的entryName: com/niko/example/ClazzName$Inner.class
