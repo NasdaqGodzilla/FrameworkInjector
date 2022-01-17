@@ -36,15 +36,15 @@ import java.io.IOException;
 import javassist.ClassPool;
 import javassist.CtClass;
 
-class CtClassWrappper implements AutoCloseable {
+class CtClassWrapper implements AutoCloseable {
     private CharSequence mStyledIdentifier;
     private CtClass mCtClass;
 
-    static CtClassWrappper makeClassSilent(ClassPool cp, java.io.InputStream is, CharSequence cs) {
+    static CtClassWrapper makeClassSilent(ClassPool cp, java.io.InputStream is, CharSequence cs) {
         try {
             return makeClass(cp, is, cs);
         } catch (IOException | RuntimeException e) {
-            Utils.fatal(CtClassWrappper.class.getSimpleName(), "" + cs + " " + e);
+            Utils.fatal(CtClassWrapper.class.getSimpleName(), "" + cs + " " + e);
         }
         return null;
     }
@@ -52,15 +52,15 @@ class CtClassWrappper implements AutoCloseable {
     /**
      * @Description:  Wrap CtClass that created from classfile input stream.
      */
-    static CtClassWrappper makeClass(ClassPool cp, java.io.InputStream is, CharSequence cs) throws
+    static CtClassWrapper makeClass(ClassPool cp, java.io.InputStream is, CharSequence cs) throws
             IOException, RuntimeException {
         if (null == cp)
             return null;
 
-        return new CtClassWrappper(cp.makeClassIfNew(is), cs);
+        return new CtClassWrapper(cp.makeClassIfNew(is), cs);
     }
 
-    public CtClassWrappper(CtClass c, CharSequence cs) {
+    public CtClassWrapper(CtClass c, CharSequence cs) {
         mCtClass = c;
         mStyledIdentifier = cs;
     }
