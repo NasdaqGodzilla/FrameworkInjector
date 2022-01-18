@@ -23,57 +23,71 @@
     \  \:\        \  \:\        \  \:\        \  \::/       \  \:\
      \__\/         \__\/         \__\/         \__\/         \__\/
  *
- * Filename     @ EntryMatchFilter.java
- * Create date  @ 2021-12-31 15:39:21
+ * Filename     @ EntryInjectConsumer.java
+ * Create date  @ 2022-01-18 17:06:53
  * Description  @
  * version      @ V1.0.0
  */
 
 package peacemaker.frameworkinjector;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
-public class EntryMatchFilter implements EntryFilter<ZipEntry> {
-    private static final String TAG = EntryMatchFilter.class.getSimpleName();
+class EntryInjectConsumer extends EntryCopyConsumer {
+    private static final String TAG = EntryInjectConsumer.class.getSimpleName();
 
-    private final java.lang.ref.WeakReference<PointcutCollectionsList> mWeakList;
+    protected WeakReference<PointcutCollectionsList> mWeakList = null;
 
-    public EntryMatchFilter(PointcutCollectionsList l) {
-        mWeakList = new java.lang.ref.WeakReference<>(l);
-    }
+    // 计量注入次数
+    private int mCntTheInject;
 
-    static boolean matched(String s, PointcutCollectionsList list) {
-        // Skip directories
-        if (!s.endsWith(".class"))
-            return false;
+    public EntryInjectConsumer(ZipOutputStream zos) {
+        super(zos);
 
-        final SpecFormatter sf =
-            SpecFormatter.with(SpecFormatter.retrieveEntryNameWithoutSuffix(s));
-        final String classFullNamePoint =
-            sf.retrieveInnerSpecAs(sf.retrieveWithPoint(), ".");
-
-        return list.containsStyledIdentifier(classFullNamePoint);
+        mWeakList =
+            new WeakReference<>(InjectEngine.get().retrievePointcutCollectionsList());
+        mCntTheInject = 0;
     }
 
     private boolean matched(String s) {
-        return matched(s, mWeakList.get());
+        return EntryMatchFilter.matched(s, mWeakList.get());
     }
 
-    private void message(String m) {
-        Utils.message(TAG, m);
+    // For t/test: getPoints().forEach()
+    protected BasePointcutCollections retrievePointcuts(String clzName) {
+        final SpecFormatter sf =
+            SpecFormatter.with(SpecFormatter.retrieveEntryNameWithoutSuffix(clzName));
+        final String classFullNamePoint =
+            sf.retrieveInnerSpecAs(sf.retrieveWithPoint(), ".");
+
+        return mWeakList.get().get(classFullNamePoint);
     }
 
-    // What does ZipEntry looks like? By ZipEntry.getName() called:
-    // com/android/server/wm/ActivityTaskManagerService$Lifecycle.class
-    // com/android/server/wm/WindowState$PowerManagerWrapper.class
+    /*
     @Override
-    public boolean test(ZipEntry t) {
-        final boolean matched = matched(t.getName().trim());
+    public void accept(ZipEntry newEntry, BufferedInputStream newEntryBis) {
 
-        if (matched)
-            message(String.format("%s matched.", t.getName()));
+    }
+    */
 
-        return matched;
+    @Override
+    public void close() {
+        super.close();
+
+        message(String.format("Finally done... mCntTheInject[%d]",
+                    mCntTheInject));
+    }
+
+    private static final void message(CharSequence cs) {
+        Utils.message(TAG, cs.toString());
+    }
+
+    private static final void fatal(CharSequence cs) {
+        Utils.fatal(TAG, cs.toString());
     }
 }
 

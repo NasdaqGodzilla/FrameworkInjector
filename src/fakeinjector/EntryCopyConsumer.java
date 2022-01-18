@@ -38,9 +38,11 @@ import java.lang.ref.WeakReference;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+// accept方法的流和entry由本类所有并管理；ZipOutputStream由InjectEngine所有并管理
+// 其中InjectEngine通过AutoClosable，借助try-with-resource为调用者提供自动生命周期管理。
 public class EntryCopyConsumer implements AutoCloseable, EntryConsumer<ZipEntry, BufferedInputStream> {
-    private final String TAG = EntryCopyConsumer.class.getSimpleName();
-    private final java.lang.ref.WeakReference<ZipOutputStream> mWeakZos;
+    private static final String TAG = EntryCopyConsumer.class.getSimpleName();
+    protected final java.lang.ref.WeakReference<ZipOutputStream> mWeakZos;
 
     // TODO: 需要重新实现ZipOutputStream的获取方式
     // INFO: 初始化目前传入null，原因是InjectorEngine会执行对zos的初始化，这里如果初始化会造成重复初始化。
