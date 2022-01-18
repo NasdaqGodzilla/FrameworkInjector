@@ -44,7 +44,8 @@ class InjectorImpl implements AutoCloseable {
     private static ClassPool sClassPool;
 
     static class ClazzLoader {
-        static CtClassWrapper makeClass(ClassPool cp, InputStream is, CharSequence styledIdentifier) {
+        static CtClassWrapper makeClass(ClassPool cp, InputStream is,
+                CharSequence styledIdentifier /* ClassName */) {
             if (null == is || null == cp)
                 fatal("ACCESS DENIED!");
 
@@ -124,6 +125,38 @@ class InjectorImpl implements AutoCloseable {
                 mInsertAfter = cs.toString();
 
             return this;
+        }
+
+        /*
+         * @Description: 根据切点信息创建InjectTarget。
+         *              CtClassWrapper的创建依赖jar输入流，且可能由不同的ClassPool管理，
+         *              因此调用者需提供InjectTarget使用的CtClassWrapper。
+         *              进一步的，由于CtClassWrapper是固定的，这意味着只能处理匹配CtClass
+         *              的切点，不属于(即类名不同)该CtClass的pointcuts将被，也必须被忽略。
+         */
+        public static <E extends BaseMethodPointcut> java.util.List<InjectTarget>
+            with(CtClassWrapper c, java.util.AbstractCollection<E> pointcuts) {
+            final java.util.LinkedList<InjectTarget> ret = new java.util.LinkedList<>();
+
+            if (null == c || null == pointcuts || 0 == pointcuts.size())
+                return ret;
+
+            final String cid = c.getName();
+            message("InjectTarget: gen for " + cid);
+
+            pointcuts.forEach((pointcut) -> {
+                if (!Utils.equals(cid, pointcut.getStyledIdentifier())) {
+                    message("Skip due to odd pointcut: " + pointcut.dumpWorld());
+                    return;
+                }
+
+                ret.add(with(c, pointcut.getMethodName().toString()));
+            });
+
+            message(String.format("InjectTarget: finish [%s](%d) with input pointcuts(%d)",
+                        cid, ret.size(), pointcuts.size()));
+
+            return ret;
         }
 
         public static InjectTarget with(CtClassWrapper c, String methodName) {
