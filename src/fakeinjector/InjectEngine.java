@@ -222,6 +222,10 @@ public class InjectEngine implements AutoCloseable {
         return this;
     }
 
+    PointcutCollectionsList retrievePointcutCollectionsList() {
+        return mPointcutCollectionsList;
+    }
+
     public ZipFileWrapper retrieveInJar() {
         return mInJar;
     }
