@@ -58,6 +58,37 @@ class InjectorImpl implements AutoCloseable {
         }
 
         private Translator() {}
+
+        static <T extends InjectTarget> CtClassWrapper performTargetInject(T target)
+                    throws javassist.CannotCompileException {
+            if (null == target || null == target.mClass.get() || null == target.mMethod.get()) {
+                fatal("Titanic is sinking!");
+                return null;
+            }
+
+            message("Translator: performTargetInject for " + target.mMethod.get().getLongName());
+            int i = 0;
+
+            try {
+                if (!Utils.isEmpty(target.mInsertBefore))
+                    target.mMethod.get().insertBefore(target.mInsertBefore);
+                i = 1;
+                if (!Utils.isEmpty(target.mInsertAfter))
+                    target.mMethod.get().insertAfter(target.mInsertAfter);
+            } catch (javassist.CannotCompileException e) {
+                message(String.format("Translator: abort due to [FAILED] insert<%s>: <%s: %s>: %s\n%s\n",
+                            0 == i ? "Before" : "After",
+                            target.mClass.get().getName(),
+                            target.mMethod.get().getName(),
+                            "" + e,
+                            target.mInsertBefore));
+                throw e;
+            } finally {
+                message("Translator: performTargetInject finish " + target.mMethod.get().getLongName());
+            }
+
+            return target.mClass.get();
+        }
     }
 
     // mClass mMethod由InjectorImpl管理，可以考虑实现为InjectTarget自身进行管理。
