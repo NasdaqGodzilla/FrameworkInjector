@@ -32,10 +32,10 @@
 
 package peacemaker.frameworkinjector;
 
-import java.io.BufferedInputStream;
+import java.io.InputStream;
 import java.util.zip.ZipEntry;
 
-public interface EntryConsumer<T extends ZipEntry, U extends BufferedInputStream>
-        extends java.util.function.BiConsumer<ZipEntry, BufferedInputStream> {
+public interface EntryConsumer<T extends ZipEntry, U extends InputStream>
+        extends java.util.function.BiConsumer<ZipEntry, InputStream> {
 }
 
