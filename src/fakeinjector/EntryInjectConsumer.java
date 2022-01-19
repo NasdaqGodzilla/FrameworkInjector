@@ -45,8 +45,8 @@ class EntryInjectConsumer extends EntryCopyConsumer {
     public EntryInjectConsumer(ZipOutputStream zos) {
         super(zos);
 
-        mWeakList =
-            new WeakReference<>(InjectEngine.get().retrievePointcutCollectionsList());
+        mWeakList = new WeakReference<>(
+                PointcutCollectionsFactory.get().retrievePointcutCollectionsList());
     }
 
     // 验证PointcutCollectionsList包含对应该Entry的切点
