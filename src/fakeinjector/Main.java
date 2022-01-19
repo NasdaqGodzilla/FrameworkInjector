@@ -60,18 +60,30 @@ public class Main {
         Utils.generateWorldThenDump(pointcuts);
 
         try {
+            /* 测试Filter及其机制工作正常
             Utils.startInjectAsFilter(inJar,
                     new EntryMatchFilter(PointcutCollectionsFactory.get().retrievePointcutCollectionsList()),
                     (e, s) ->
                         Utils.message("Main.startInjectAsFilter", "接收到匹配项: " + ((java.util.zip.ZipEntry) e).getName()),
                         null);
+            */
 
-            Utils.startInjectAsCopy(inJar, outJar);
-        } catch (java.io.IOException e) {
-            Utils.fatal("frameworkinjector", "" + e);
+            // 不进行注入，直接拷贝(通过Inject consumer机制)。
+            // Utils.startInjectAsCopy(inJar, outJar);
+
+            final PointcutCollectionsList pointcutList =
+                PointcutCollectionsFactory.get().retrievePointcutCollectionsList();
+            Utils.startInjectWithConsumer(inJar, outJar, pointcutList,
+                    new EntryMatchFilter(pointcutList),
+                    new EntryInjectConsumer(null),
+                    new EntryCopyConsumer(null));
+
+        } catch (Exception e) {
+            Utils.message("frameworkinjector", "" + e.toString());
+            throw e;
         }
 
-        /*
+        /* 不进行注入，直接拷贝(通过Java NIO机制)。
         try {
             Utils.copyTo(inJar, outJar);
         } catch (java.io.IOException e) {
