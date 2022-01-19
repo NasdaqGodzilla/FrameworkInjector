@@ -67,7 +67,7 @@ public class InjectEngine implements AutoCloseable {
             return entries();
         }
 
-        public void forEachEntry(EntryConsumer<? extends ZipEntry, BufferedInputStream> entryConsumer) {
+        public void forEachEntry(EntryConsumer<? extends ZipEntry, InputStream> entryConsumer) {
             if (null == entryConsumer)
                 Utils.fatal("ZipFileWrapper", "Happy Christmas!");
 
@@ -84,8 +84,8 @@ public class InjectEngine implements AutoCloseable {
          * @return: void
          */
         public void forEachEntryWithFilter(String entryType,
-                    EntryFilter<? extends ZipEntry> entryFilter, EntryConsumer<? extends ZipEntry, BufferedInputStream> entryConsumer,
-                    EntryConsumer<? extends ZipEntry, BufferedInputStream> unmatchedConsumer) {
+                    EntryFilter<? extends ZipEntry> entryFilter, EntryConsumer<? extends ZipEntry, InputStream> entryConsumer,
+                    EntryConsumer<? extends ZipEntry, InputStream> unmatchedConsumer) {
             if (null == entryConsumer)
                 Utils.fatal("ZipFileWrapper", "Happy New Year!");
 

@@ -60,8 +60,7 @@ class InjectorImpl implements AutoCloseable {
 
         private Translator() {}
 
-        static <T extends InjectTarget> CtClassWrapper performTargetInject(T target)
-                    throws javassist.CannotCompileException {
+        static <T extends InjectTarget> CtClassWrapper performTargetInject(T target) {
             if (null == target || null == target.mClass.get() || null == target.mMethod.get()) {
                 fatal("Titanic is sinking!");
                 return null;
@@ -83,7 +82,7 @@ class InjectorImpl implements AutoCloseable {
                             target.mMethod.get().getName(),
                             "" + e,
                             target.mInsertBefore));
-                throw e;
+                fatal("" + e);
             } finally {
                 message("Translator: performTargetInject finish " + target.mMethod.get().getLongName());
             }

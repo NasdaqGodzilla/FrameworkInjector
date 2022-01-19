@@ -78,7 +78,7 @@ class CtClassWrapper implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         if (null != mCtClass)
             mCtClass.detach();
 
