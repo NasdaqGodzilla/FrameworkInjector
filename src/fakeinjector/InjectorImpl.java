@@ -81,7 +81,7 @@ class InjectorImpl implements AutoCloseable {
                             target.mClass.get().getName(),
                             target.mMethod.get().getName(),
                             "" + e,
-                            target.mInsertBefore));
+                            0 == i ? target.mInsertBefore : target.mInsertAfter));
                 fatal("" + e);
             } finally {
                 message("Translator: performTargetInject finish " + target.mMethod.get().getLongName());
