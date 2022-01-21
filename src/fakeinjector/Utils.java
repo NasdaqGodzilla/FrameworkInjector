@@ -180,6 +180,17 @@ public class Utils {
             EntryFilter filter, EntryConsumer targetConsumer, EntryConsumer otherConsumer) {
         try (final InjectEngine injectEngine = InjectEngine.startEngine(inJar, outJar, pointcutList)) {
             final InjectEngine.Injector injector = injectEngine.retrieveInjector();
+
+            // FIXME: Are there any better ways to set class search path?
+            try {
+                InjectorImpl.get().retrieveClassPool().appendClassPath(inJar);
+            } catch (javassist.NotFoundException e) {
+                fatal("startInjectWithConsumer", "" + e);
+            } finally {
+                message("startInjectWithConsumer",
+                        "ClassPool: " + InjectorImpl.get().retrieveClassPool().toString());
+            }
+
             injector.performInject(injectEngine.retrieveInJar(), pointcutList, filter, targetConsumer, otherConsumer);
         } finally {
             message("startInjectWithConsumer", "finally finished.");
