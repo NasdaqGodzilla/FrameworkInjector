@@ -41,6 +41,7 @@ public class Main {
         String inJar = null;
         String outJar = null;
         String pointcuts = null;
+        String cplist = null;
 
         for (int i = 0; i < args.length; i++) {
             final String arg_ = args[i].trim();
@@ -50,6 +51,8 @@ public class Main {
                 outJar = args[++i].trim();
             } else if ("-pointcuts".equals(arg_)) {
                 pointcuts = args[++i].trim();
+            } else if ("-cplist".equals(arg_)) {
+                cplist = args[++i].trim();
             }
         }
 
@@ -71,6 +74,8 @@ public class Main {
             // 不进行注入，直接拷贝(通过Inject consumer机制)。
             // Utils.startInjectAsCopy(inJar, outJar);
 
+            InjectorImpl.get().retrieveClassPool().appendPathList(cplist);
+
             final PointcutCollectionsList pointcutList =
                 PointcutCollectionsFactory.get().retrievePointcutCollectionsList();
             Utils.startInjectWithConsumer(inJar, outJar, pointcutList,
@@ -78,9 +83,8 @@ public class Main {
                     new EntryInjectConsumer(null),
                     new EntryCopyConsumer(null));
 
-        } catch (Exception e) {
-            Utils.message("frameworkinjector", "" + e.toString());
-            throw e;
+        } catch (javassist.NotFoundException e) {
+            Utils.fatal("frameworkinjector", "" + e.toString());
         }
 
         /* 不进行注入，直接拷贝(通过Java NIO机制)。
