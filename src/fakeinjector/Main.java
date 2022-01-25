@@ -42,6 +42,7 @@ public class Main {
         String outJar = null;
         String pointcuts = null;
         String cplist = null;
+        String pointcutsPath = null;
 
         for (int i = 0; i < args.length; i++) {
             final String arg_ = args[i].trim();
@@ -53,14 +54,19 @@ public class Main {
                 pointcuts = args[++i].trim();
             } else if ("-cplist".equals(arg_)) {
                 cplist = args[++i].trim();
+            } else if ("-pointcuts_json".equals(arg_)) {
+                pointcutsPath = args[++i].trim();
             }
         }
 
         Utils.message("frameworkinjector", "inJar-outJar: " + inJar + " " + outJar +
-                " pointcuts: " + pointcuts);
+                " pointcuts: " + pointcuts +
+                " cplist: " + cplist +
+                " pointcutsPath: " + pointcutsPath);
         Utils.message("frameworkinjector", exp);
 
-        Utils.generateWorldThenDump(pointcuts);
+        if (null != pointcuts)
+            Utils.generateWorldThenDump(pointcuts);
 
         try {
             /* 测试Filter及其机制工作正常
