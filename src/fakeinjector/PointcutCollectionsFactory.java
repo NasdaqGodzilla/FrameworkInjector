@@ -59,6 +59,7 @@ public class PointcutCollectionsFactory implements Factory {
     }
 
     @Override
+    // TODO: Support insertBefore and insertAfter
     public BaseMethodPointcut retrieveMethodPointcut(CharSequence target) {
         assert !Utils.isEmpty(target) : "Target is the target!";
 
@@ -87,9 +88,11 @@ public class PointcutCollectionsFactory implements Factory {
         });
 
         if (!Utils.isEmpty(targetInfo.clzName)) {
-            return new ClassMethodPointcut(targetInfo.clzName, targetInfo.methodName, targetInfo.paramsType);
+            return new ClassMethodPointcut(targetInfo.clzName, targetInfo.methodName,
+                    targetInfo.paramsType, null, null);
         } else if (!Utils.isEmpty(targetInfo.methodName)) {
-            return new ClassMethodPointcut(Utils.通配符, targetInfo.methodName, targetInfo.paramsType);
+            return new ClassMethodPointcut(Utils.通配符, targetInfo.methodName,
+                    targetInfo.paramsType, null, null);
         }
 
         Utils.fatal("TargetParse", "Something went wrong: " + target);
