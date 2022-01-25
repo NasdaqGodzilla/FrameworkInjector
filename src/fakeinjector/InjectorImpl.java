@@ -224,13 +224,9 @@ class InjectorImpl implements AutoCloseable {
         // TODO: 创建class时处理重载方法。
         public static InjectTarget with(CtClassWrapper c, String methodName, String[] p,
                 CharSequence bf, CharSequence af) {
-            try {
-                return with(c, c.retrieveCtClass().getDeclaredMethod(methodName), p, bf, af);
-            } catch (javassist.NotFoundException e) {
-                fatal("" + e);
-            }
-
-            return null;
+            return with(c,
+                    ClazzLoader.getMethod(sClassPool, c.retrieveCtClass(), methodName, p),
+                    p, bf, af);
         }
 
         public static InjectTarget with(CtClassWrapper c, CtMethod m, String[] p,
