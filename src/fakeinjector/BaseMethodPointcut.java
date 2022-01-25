@@ -35,6 +35,17 @@ public abstract class BaseMethodPointcut {
     protected final CharSequence methodName;
     protected final String[] paramTypes;
 
+    protected final CharSequence insertBefore;
+    protected final CharSequence insertAfter;
+
+    public CharSequence getInsertBefore() {
+        return insertBefore;
+    }
+
+    public CharSequence getInsertAfter() {
+        return insertAfter;
+    }
+
     public CharSequence getMethodName() {
         return methodName;
     }
@@ -48,14 +59,17 @@ public abstract class BaseMethodPointcut {
     }
 
     public BaseMethodPointcut(CharSequence m) {
-        this(m, null);
+        this(m, null, null, null);
     }
 
-    public BaseMethodPointcut(CharSequence m, String[] p) {
+    public BaseMethodPointcut(CharSequence m, String[] p,
+            CharSequence bf, CharSequence af) {
         assert !Utils.isEmpty(m);
 
         methodName = m;
         paramTypes = p;
+        insertBefore = bf;
+        insertAfter = af;
     }
 
     public abstract String dumpWorld();

@@ -44,11 +44,12 @@ public class ClassMethodPointcut extends BaseMethodPointcut {
     }
 
     public ClassMethodPointcut(CharSequence c, CharSequence m) {
-        this(c, m, null);
+        this(c, m, null, null, null);
     }
 
-    public ClassMethodPointcut(CharSequence c, CharSequence m, String[] p) {
-        super(m, p);
+    public ClassMethodPointcut(CharSequence c, CharSequence m, String[] p,
+            CharSequence bf, CharSequence af) {
+        super(m, p, bf, af);
 
         assert !Utils.isEmpty(c);
         assert !Utils.isEmpty(m);
@@ -62,6 +63,9 @@ public class ClassMethodPointcut extends BaseMethodPointcut {
         sb.append(String.format("<%s>: ", getStyledIdentifier()));
         sb.append(String.format("methodName: %s ", methodName) +
                 String.join(Utils.逗号符, Utils.getNonNullItems(paramTypes)));
+        sb.append("\t");
+        sb.append("bf: " + insertBefore);
+        sb.append("af: " + insertAfter);
         return sb.toString();
     }
 }

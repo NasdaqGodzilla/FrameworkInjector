@@ -95,15 +95,17 @@ class InjectorImpl implements AutoCloseable {
     static class InjectTarget {
         final WeakReference<? extends CtClassWrapper> mClass;
         final WeakReference<? extends CtMethod> mMethod;
+        final String[] mParams;
         String mInsertBefore;
         String mInsertAfter;
 
-        InjectTarget(CtClassWrapper c, CtMethod m, String before, String after) {
+        InjectTarget(CtClassWrapper c, CtMethod m, String[] p, String before, String after) {
             if (null == c || null == m)
                 fatal("We don't blame you even if you make a mistake");
 
             mClass = new WeakReference<>(c);
             mMethod = new WeakReference<>(m);
+            mParams = p;
             mInsertBefore = before;
             mInsertAfter = after;
         }
@@ -149,7 +151,8 @@ class InjectorImpl implements AutoCloseable {
                     return;
                 }
 
-                ret.add(with(c, pointcut.getMethodName().toString()));
+                ret.add(with(c, pointcut.getMethodName().toString(), pointcut.getParamTypes(),
+                            pointcut.getInsertBefore(), pointcut.getInsertAfter()));
             });
 
             message(String.format("InjectTarget: finish [%s](%d) with input pointcuts(%d)",
@@ -158,9 +161,11 @@ class InjectorImpl implements AutoCloseable {
             return ret;
         }
 
-        public static InjectTarget with(CtClassWrapper c, String methodName) {
+        // TODO: 创建class时处理重载方法。
+        public static InjectTarget with(CtClassWrapper c, String methodName, String[] p,
+                CharSequence bf, CharSequence af) {
             try {
-                return with(c, c.retrieveCtClass().getDeclaredMethod(methodName));
+                return with(c, c.retrieveCtClass().getDeclaredMethod(methodName), p, bf, af);
             } catch (javassist.NotFoundException e) {
                 fatal("" + e);
             }
@@ -168,8 +173,9 @@ class InjectorImpl implements AutoCloseable {
             return null;
         }
 
-        public static InjectTarget with(CtClassWrapper c, CtMethod m) {
-            return new InjectTarget(c, m, null, null);
+        public static InjectTarget with(CtClassWrapper c, CtMethod m, String[] p,
+                CharSequence bf, CharSequence af) {
+            return new InjectTarget(c, m, p, bf.toString(), af.toString());
         }
     }
 
