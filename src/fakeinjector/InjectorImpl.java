@@ -36,6 +36,7 @@ import java.io.InputStream;
 import java.lang.ref.WeakReference;
 
 import javassist.ClassPool;
+import javassist.CtClass;
 import javassist.CtMethod;
 
 class InjectorImpl implements AutoCloseable {
@@ -44,12 +45,71 @@ class InjectorImpl implements AutoCloseable {
     private static ClassPool sClassPool;
 
     static class ClazzLoader {
+        private static final java.util.Map<String, CtClass> sPrimitiveTypeMap = new java.util.HashMap<>(9);
+
+        static {
+            sPrimitiveTypeMap.put("boolean", CtClass.booleanType);
+            sPrimitiveTypeMap.put("char", CtClass.charType);
+            sPrimitiveTypeMap.put("byte", CtClass.byteType);
+            sPrimitiveTypeMap.put("short", CtClass.shortType);
+            sPrimitiveTypeMap.put("int", CtClass.intType);
+            sPrimitiveTypeMap.put("long", CtClass.longType);
+            sPrimitiveTypeMap.put("float", CtClass.floatType);
+            sPrimitiveTypeMap.put("double", CtClass.doubleType);
+            sPrimitiveTypeMap.put("void", CtClass.voidType);
+        }
+
         static CtClassWrapper makeClass(ClassPool cp, InputStream is,
                 CharSequence styledIdentifier /* ClassName */) {
             if (null == is || null == cp)
                 fatal("ACCESS DENIED!");
 
             return CtClassWrapper.makeClassSilent(cp, is, styledIdentifier);
+        }
+
+        public static CtClass getClass(ClassPool cp, String classname) {
+            if (sPrimitiveTypeMap.containsKey(classname))
+                return sPrimitiveTypeMap.get(classname);
+
+            if (Utils.isEmpty(classname) || null == cp)
+                return null;
+
+            try {
+                return cp.get(classname);
+            } catch (javassist.NotFoundException e) {
+                fatal("Failed getClass " + classname + " " + e);
+            }
+
+            return null;
+        }
+
+        public static CtMethod getMethod(ClassPool cp, CtClass ct, String name, String[] params) {
+            if (Utils.isEmpty(name) || null == ct)
+                return null;
+
+            if (ct.isPrimitive())
+                fatal("Failed getMethod " + name + " with stupid " + ct);
+
+            if (null == params || 0 == params.length) {
+                try {
+                    return ct.getDeclaredMethod(name);
+                } catch (javassist.NotFoundException e) {
+                    fatal("Failed getMethod " + name + " " + e);
+                }
+            }
+
+            final java.util.List<CtClass> listParams = new java.util.LinkedList<>();
+            for (String param : params) {
+                listParams.add(getClass(cp, param));
+            }
+            try {
+                return ct.getDeclaredMethod(name, listParams.toArray(new CtClass[listParams.size()]));
+            } catch (javassist.NotFoundException e) {
+                fatal("Failed getMethod " + name +
+                        " " + String.join(" ", params) + " " + e);
+            }
+
+            return null;
         }
     }
 
