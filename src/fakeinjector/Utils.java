@@ -86,6 +86,21 @@ public class Utils {
         return java.util.stream.Stream.of(strArr).filter(i -> !isEmpty(i)).toArray(String[]::new);
     }
 
+    public static PointcutPojo parsePointcutInfoJson(String filepath) {
+        if (isEmpty(filepath))
+            fatal("parsePointcutInfo", "...");
+
+        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        try {
+            java.io.File f = new java.io.File(filepath);
+            return mapper.readValue(f, PointcutPojo.class);
+        } catch (Exception e) {
+            fatal("parsePointcutInfo", "... " + e);
+        }
+
+        return null;
+    }
+
     public static void generateWorldThenDump(CharSequence targets) {
         generateWorld(targets);
         PointcutCollectionsFactory.get().dump();
