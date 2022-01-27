@@ -83,6 +83,9 @@ public class Utils {
     public static String[] getNonNullItems(String[] strArr) {
         assert null != strArr && 0 < strArr.length;
 
+        if (null == strArr)
+            return new String[] {};
+
         return java.util.stream.Stream.of(strArr).filter(i -> !isEmpty(i)).toArray(String[]::new);
     }
 
@@ -102,7 +105,16 @@ public class Utils {
     }
 
     public static void generateWorldThenDump(CharSequence targets) {
-        generateWorld(targets);
+        generateWorldThenDump(null, targets);
+    }
+
+    public static void generateWorldThenDump(String filepath, CharSequence targets) {
+        if (!isEmpty(filepath))
+            generateWorldJson(filepath);
+
+        if (!isEmpty(targets))
+            generateWorld(targets);
+
         PointcutCollectionsFactory.get().dump();
     }
 
@@ -119,6 +131,11 @@ public class Utils {
 
         final Factory factory = PointcutCollectionsFactory.getOrCreate("");
         factory.add(factory.retrieveMethodPointcut(targets));
+    }
+
+    public static void generateWorldJson(String filepath) {
+        final Factory factory = PointcutCollectionsFactory.getOrCreate("");
+        factory.add(PointcutCollectionsFactory.retrieveMethodPointcutJson(filepath));
     }
 
     @FunctionalInterface

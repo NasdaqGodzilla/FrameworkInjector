@@ -112,6 +112,49 @@ public class PointcutCollectionsFactory implements Factory {
         return ret;
     }
 
+    public static java.util.List retrieveMethodPointcutJson(String filepath) {
+        if (Utils.isEmpty(filepath))
+            return null;
+
+        final PointcutPojo pojo = Utils.parsePointcutInfoJson(filepath);
+        return fromPointcutPojo(pojo);
+    }
+
+    public static BaseMethodPointcut fromPointcut(Pointcut p) {
+        if (null == p)
+            return null;
+
+        final java.util.List<String> listTargetParams = p.getTargetParams();
+        return new ClassMethodPointcut(p.getTargetClass(), p.getTargetMethod(),
+                null != listTargetParams && 0 < listTargetParams.size()
+                        ? listTargetParams.toArray(new String[p.getTargetParams().size()])
+                        : null,
+                p.getInsertBefore(), p.getInsertAfter());
+    }
+
+    public static java.util.List fromPointcutPojo(PointcutPojo pojo) {
+        if (null == pojo)
+            return null;
+
+        final java.util.LinkedList<BaseMethodPointcut> ret = new java.util.LinkedList<>();
+        pojo.getPointcuts().stream().filter(p -> p.getEnable())
+            .collect(java.util.stream.Collectors.toList())
+            .forEach(p -> ret.add(fromPointcut(p)));
+
+        return ret;
+    }
+
+    public static <T> T ifPointcutEnabled(Pointcut p,
+            java.util.concurrent.Callable<T> call) throws Exception {
+        if (null == p || null == call)
+            return null;
+
+        if (p.getEnable())
+            return call.call();
+
+        return null;
+    }
+
     public void dump() {
         Utils.message("dump", dumpWorld());
     }
