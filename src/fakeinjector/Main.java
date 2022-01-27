@@ -65,12 +65,13 @@ public class Main {
                 " pointcutsPath: " + pointcutsPath);
         Utils.message("frameworkinjector", exp);
 
-        if (!Utils.isEmpty(pointcuts))
-            Utils.generateWorldThenDump(pointcuts);
-
         if (!Utils.isEmpty(pointcutsPath))
-            Utils.message("fakeinjector", "test: " +
+            Utils.message("frameworkinjector", "test: " +
                     Utils.parsePointcutInfoJson(pointcutsPath).toString());
+        Utils.message("frameworkinjector", exp);
+
+        if (!Utils.isEmpty(pointcuts) || !Utils.isEmpty(pointcutsPath))
+            Utils.generateWorldThenDump(pointcutsPath, pointcuts);
 
         try {
             /* 测试Filter及其机制工作正常
