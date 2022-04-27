@@ -33,6 +33,9 @@ package peacemaker.frameworkinjector;
 
 import java.util.regex.*;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class Utils {
 
     public static final String LOG_TAG = "frameworkinjector";
@@ -93,7 +96,8 @@ public class Utils {
         if (isEmpty(filepath))
             fatal("parsePointcutInfo", "...");
 
-        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         try {
             java.io.File f = new java.io.File(filepath);
             return mapper.readValue(f, PointcutPojo.class);

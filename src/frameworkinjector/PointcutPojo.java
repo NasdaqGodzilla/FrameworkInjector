@@ -6,6 +6,7 @@ import java.util.List;
 import javax.annotation.Generated;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -14,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "pointcuts"
 })
 @Generated("jsonschema2pojo")
+@JsonIgnoreProperties
 public class PointcutPojo implements Serializable {
     @JsonProperty("pointcuts")
     private List<Pointcut> pointcuts = null;
