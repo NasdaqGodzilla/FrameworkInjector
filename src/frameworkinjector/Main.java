@@ -34,6 +34,8 @@ package peacemaker.frameworkinjector;
 public class Main {
     private static final String exp = "\r\n==========================================\r\n";
 
+    static boolean DEBUG = false;
+
     public static void main(String[] args) throws EarlyExitException {
         Utils.message("frameworkinjector", "frameworkinjector work!");
         Utils.message("frameworkinjector", exp);
@@ -56,6 +58,8 @@ public class Main {
                 cplist = args[++i].trim();
             } else if ("-pointcuts_json".equals(arg_)) {
                 pointcutsPath = args[++i].trim();
+            } else if ("-debug".equals(arg_)) {
+                DEBUG = true;
             }
         }
 
