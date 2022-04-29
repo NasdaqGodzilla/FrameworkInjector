@@ -119,6 +119,8 @@ public class Utils {
         if (!isEmpty(targets))
             generateWorld(targets);
 
+        PointcutCollectionsFactory.get().prepare();
+
         PointcutCollectionsFactory.get().dump();
     }
 

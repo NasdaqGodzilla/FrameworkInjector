@@ -39,6 +39,11 @@ public class PointcutCollectionsFactory implements Factory {
     }
 
     @Override
+    public void prepare() {
+        mCollectionsList.prepare();
+    }
+
+    @Override
     public BasePointcutCollections add(BaseMethodPointcut e) {
         assert null != e;
 
@@ -157,6 +162,7 @@ public class PointcutCollectionsFactory implements Factory {
 
     public void dump() {
         Utils.message("dump", dumpWorld());
+        Utils.message("Proceed", "\r\n");
     }
 
     public String dumpWorld() {
@@ -166,6 +172,14 @@ public class PointcutCollectionsFactory implements Factory {
         mCollectionsList.forEach(e -> {
             sb.append("\r\n\t\t");
             sb.append(e.dumpWorld());
+        });
+        final java.util.Map<String, java.util.regex.Pattern> patterns = mCollectionsList.retrievePatterns();
+        sb.append(String.format("\r\n\r\n\tPointcutCollecetionsList Pattern.size: %d", patterns.size()));
+        patterns.forEach((patternIdentifier, pattern) -> {
+            sb.append("\r\n\t\t");
+            sb.append(String.format("Pattern: %s", pattern.pattern()));
+            sb.append("\r\n\t\t\t");
+            sb.append(mCollectionsList.get(patternIdentifier).dumpWorld());
         });
         return sb.toString();
     }

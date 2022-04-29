@@ -52,7 +52,8 @@ public class EntryMatchFilter implements EntryFilter<ZipEntry> {
         final String classFullNamePoint =
             sf.retrieveInnerSpecAs(sf.retrieveWithPoint(), ".");
 
-        return list.containsStyledIdentifier(classFullNamePoint);
+        return list.containsStyledIdentifier(classFullNamePoint) ||
+                list.containsMatched(classFullNamePoint);
     }
 
     private boolean matched(String s) {
