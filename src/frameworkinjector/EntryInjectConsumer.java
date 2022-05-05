@@ -34,6 +34,7 @@ package peacemaker.frameworkinjector;
 import java.io.InputStream;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -58,6 +59,10 @@ class EntryInjectConsumer extends EntryCopyConsumer {
         return mWeakList.get().get(toNameWithPoint(entryName));
     }
 
+    protected java.util.Collection<? extends BasePointcutCollections> retrieveMatchedPointcuts(String entryName) {
+        return mWeakList.get().getMatched(toNameWithPoint(entryName));
+    }
+
     static String toNameWithPoint(String entryName) {
         final SpecFormatter sf =
             SpecFormatter.with(SpecFormatter.retrieveEntryNameWithoutSuffix(entryName));
@@ -79,7 +84,14 @@ class EntryInjectConsumer extends EntryCopyConsumer {
         }
 
         final BasePointcutCollections pointcuts = retrievePointcuts(newEntryName);
-        if (null == pointcuts || 0 == pointcuts.getPoints().size()) {
+        final java.util.Collection<? extends BasePointcutCollections> matchedPointcuts = retrieveMatchedPointcuts(newEntryName);
+        final boolean noPointcuts =
+            null == pointcuts || 0 == pointcuts.getPoints().size();
+        final boolean noMatchedPointcuts =
+            null == matchedPointcuts || 0 == matchedPointcuts.size();
+        final boolean emptyPointcuts = noPointcuts && noMatchedPointcuts;
+
+        if (emptyPointcuts) {
             fatal("Trying accept matched entry but failed to retrieve pointcuts. " +
                     newEntryName);
             return;
@@ -92,13 +104,45 @@ class EntryInjectConsumer extends EntryCopyConsumer {
             final String loadedClassName = ctClassWrapper.getCtName();
             message("Accept: ClazzLoader success load " + loadedClassName);
 
-            final java.util.List<? extends InjectorImpl.InjectTarget> injectTargets =
-                InjectorImpl.InjectTarget.with(ctClassWrapper, pointcuts.getPoints());
-            if (0 == injectTargets.size())
-                fatal("Trying accept matched and loaded class but failed to retrieve inject targets. " +
-                        " Pointcuts size: " + pointcuts.getPoints().size());
+            if (!noMatchedPointcuts) {
+                final javassist.CtMethod[] methods = ctClassWrapper.retrieveCtClass().getDeclaredMethods();
+                final java.util.List<InjectorImpl.InjectTarget> injectTargets = new java.util.LinkedList<>();
 
-            injectTargets.forEach(InjectorImpl.Translator::performTargetInject);
+                matchedPointcuts.forEach(c -> {
+                    // An unnessary identifier matched check.
+                    // if (!matched) return;
+
+                    if (null == c || 0 == c.getPoints().size())
+                        return;
+
+                    // Traversing the methods of class to generate InjectTarget that matched.
+                    c.getPoints().forEach(p -> {
+                        final BaseMethodPointcut pointcut = (BaseMethodPointcut) p;
+                        final Pattern pattern = Pattern.compile(pointcut.getMethodName().toString());
+                        for (javassist.CtMethod method : methods) {
+                            if (!pattern.matcher(method.getName()).matches())
+                                return;
+
+                            injectTargets.add(InjectorImpl.InjectTarget.with(ctClassWrapper,
+                                        method, null,
+                                        pointcut.getInsertBefore(),
+                                        pointcut.getInsertAfter()));
+                        }
+                    });
+                });
+
+                injectTargets.forEach(InjectorImpl.Translator::performTargetInject);
+            }
+
+            if (!noPointcuts) {
+                final java.util.List<? extends InjectorImpl.InjectTarget> injectTargets =
+                    InjectorImpl.InjectTarget.with(ctClassWrapper, pointcuts.getPoints());
+                if (0 == injectTargets.size())
+                    fatal("Trying accept matched and loaded class but failed to retrieve inject targets. " +
+                            " Pointcuts size: " + pointcuts.getPoints().size());
+
+                injectTargets.forEach(InjectorImpl.Translator::performTargetInject);
+            }
 
             boolean flag = false;
             try (final java.io.ByteArrayInputStream bais =
