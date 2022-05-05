@@ -120,31 +120,45 @@ class InjectorImpl implements AutoCloseable {
 
         private Translator() {}
 
+        static boolean support(javassist.CtMethod m) {
+            return null != m &&
+                    !javassist.Modifier.isNative(m.getModifiers()) &&
+                    !javassist.Modifier.isAbstract(m.getModifiers());
+        }
+
         static <T extends InjectTarget> CtClassWrapper performTargetInject(T target) {
             if (null == target || null == target.mClass.get() || null == target.mMethod.get()) {
                 fatal("Titanic is sinking!");
                 return null;
             }
 
-            message("Translator: performTargetInject for " + target.mMethod.get().getLongName());
+            final javassist.CtMethod ctMethod = target.mMethod.get();
+
+            message("Translator: performTargetInject for " + ctMethod.getLongName());
             int i = 0;
 
             try {
+                if (!support(ctMethod)) {
+                    message("Translator: DENY! It's not suprised that this guy does not support! " +
+                            ctMethod.getLongName());
+                    return target.mClass.get();
+                }
+
                 if (!Utils.isEmpty(target.mInsertBefore))
-                    target.mMethod.get().insertBefore(target.mInsertBefore);
+                    ctMethod.insertBefore(target.mInsertBefore);
                 i = 1;
                 if (!Utils.isEmpty(target.mInsertAfter))
-                    target.mMethod.get().insertAfter(target.mInsertAfter);
+                    ctMethod.insertAfter(target.mInsertAfter);
             } catch (javassist.CannotCompileException e) {
                 message(String.format("Translator: abort due to [FAILED] insert<%s>: <%s: %s>: %s\n%s\n",
                             0 == i ? "Before" : "After",
                             target.mClass.get().getName(),
-                            target.mMethod.get().getName(),
+                            ctMethod.getName(),
                             "" + e,
                             0 == i ? target.mInsertBefore : target.mInsertAfter));
                 fatal("" + e);
             } finally {
-                message("Translator: performTargetInject finish " + target.mMethod.get().getLongName());
+                message("Translator: performTargetInject finish " + ctMethod.getLongName());
             }
 
             return target.mClass.get();
