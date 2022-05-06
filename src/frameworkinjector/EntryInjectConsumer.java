@@ -119,12 +119,15 @@ class EntryInjectConsumer extends EntryCopyConsumer {
                     c.getPoints().forEach(p -> {
                         final BaseMethodPointcut pointcut = (BaseMethodPointcut) p;
                         final Pattern pattern = Pattern.compile(pointcut.getMethodName().toString());
+                        int index = -1;
                         for (javassist.CtMethod method : methods) {
+                            ++index;
+
                             if (!pattern.matcher(method.getName()).matches())
                                 return;
 
                             injectTargets.add(InjectorImpl.InjectTarget.with(ctClassWrapper,
-                                        method, null,
+                                        methods[index], null,
                                         pointcut.getInsertBefore(),
                                         pointcut.getInsertAfter()));
                         }
