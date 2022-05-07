@@ -88,7 +88,7 @@ class CtClassWrapper implements AutoCloseable {
 
     @Override
     public String toString() {
-        return String.format("<%d, %s>: %s",
+        return String.format("<%s, %s>: %s",
                 Integer.toHexString(System.identityHashCode(this)),
                 getName(),
                 "" + mCtClass);
