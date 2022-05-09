@@ -113,7 +113,14 @@ public class PointcutCollectionsList extends java.util.LinkedList<BasePointcutCo
         mPatterns = new java.util.HashMap<>(size());
         forEach(e -> {
             final String styledId = e.getStyledIdentifier();
-            if (styledId.contains("*"))
+            if (styledId.contains("*") ||
+                    styledId.contains("^") ||
+                    // TODO: 暂不处理$,因类名包含$是合法的
+                    // styledId.contains("$") ||
+                    styledId.contains("+") ||
+                    styledId.contains("?") ||
+                    styledId.contains("|") ||
+                    styledId.contains("["))
                 mPatterns.put(styledId, Pattern.compile(styledId));
         });
     }
