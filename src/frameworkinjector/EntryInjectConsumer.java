@@ -104,7 +104,11 @@ class EntryInjectConsumer extends EntryCopyConsumer {
             final String loadedClassName = ctClassWrapper.getCtName();
             message("Accept: ClazzLoader success load " + loadedClassName);
 
-            if (!noMatchedPointcuts) {
+            final boolean skip = !InjectorImpl.Translator.support(ctClassWrapper.retrieveCtClass());
+            if (skip)
+                message("Accept: Skip " + loadedClassName);
+
+            if (!skip && !noMatchedPointcuts) {
                 final javassist.CtMethod[] methods = ctClassWrapper.retrieveCtClass().getDeclaredMethods();
                 final java.util.List<InjectorImpl.InjectTarget> injectTargets = new java.util.LinkedList<>();
 
@@ -137,7 +141,7 @@ class EntryInjectConsumer extends EntryCopyConsumer {
                 injectTargets.forEach(InjectorImpl.Translator::performTargetInject);
             }
 
-            if (!noPointcuts) {
+            if (!skip && !noPointcuts) {
                 final java.util.List<? extends InjectorImpl.InjectTarget> injectTargets =
                     InjectorImpl.InjectTarget.with(ctClassWrapper, pointcuts.getPoints());
                 if (0 == injectTargets.size())

@@ -120,7 +120,12 @@ class InjectorImpl implements AutoCloseable {
 
         private Translator() {}
 
-        static boolean support(javassist.CtMethod m) {
+        static boolean support(CtClass c) {
+            return null != c &&
+                !javassist.Modifier.isInterface(c.getModifiers());
+        }
+
+        static boolean support(CtMethod m) {
             return null != m &&
                     !javassist.Modifier.isNative(m.getModifiers()) &&
                     !javassist.Modifier.isAbstract(m.getModifiers());
@@ -128,7 +133,7 @@ class InjectorImpl implements AutoCloseable {
 
         static <T extends InjectTarget> CtClassWrapper performTargetInject(T target) {
             if (null == target || null == target.mClass.get() || null == target.mMethod.get()) {
-                fatal("Titanic is sinking!");
+                fatal("Titanic is sinking! " + target.mClass.get() + " " + target.mMethod.get());
                 return null;
             }
 
