@@ -127,8 +127,13 @@ class EntryInjectConsumer extends EntryCopyConsumer {
                         for (javassist.CtMethod method : methods) {
                             ++index;
 
+                            if (Main.DEBUG)
+                                message("\t- Method " + method.getName() + " checking by " + pattern.pattern());
+
                             if (!pattern.matcher(method.getName()).matches())
-                                return;
+                                continue;
+
+                            message("\tAccept: Method matched " + method.getName());
 
                             injectTargets.add(InjectorImpl.InjectTarget.with(ctClassWrapper,
                                         methods[index], null,
@@ -162,7 +167,6 @@ class EntryInjectConsumer extends EntryCopyConsumer {
                 message(String.format("Accept: finally finished: %s [%s]",
                             clzNameWithPoint, flag ? "SUCCESS" : "FAILED"));
             }
-
         } catch (Utils.FatalMessageException e) {
             fatal("Accept: fatal error... " + e);
         }
