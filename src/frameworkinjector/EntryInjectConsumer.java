@@ -143,7 +143,19 @@ class EntryInjectConsumer extends EntryCopyConsumer {
                     });
                 });
 
+                // System.gc();
+
                 injectTargets.forEach(InjectorImpl.Translator::performTargetInject);
+
+                // 防止methods被gc销毁，导致performTargetInject取得空的method，进一步触发致命异常终止进程
+                if (true) {
+                    // 在performTargetInject之前添加'System.gc()'以提升崩溃概率
+                    // (提升前，概率取决于JVM参数以及内存工况。提升后，为100%)，将if的true修改为false触发该崩溃;
+                    // 本修改的原理是保持methods reachable，确保performTargetInject阶段不会被销毁
+                    if (methods.length == Integer.MIN_VALUE)
+                        System.arraycopy(methods, 0, new Object[methods.length], 0, methods.length);
+                }
+
             }
 
             if (!skip && !noPointcuts) {

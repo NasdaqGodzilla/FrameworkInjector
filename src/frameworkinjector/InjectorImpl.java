@@ -133,7 +133,7 @@ class InjectorImpl implements AutoCloseable {
 
         static <T extends InjectTarget> CtClassWrapper performTargetInject(T target) {
             if (null == target || null == target.mClass.get() || null == target.mMethod.get()) {
-                fatal("Titanic is sinking! " + target.mClass.get() + " " + target.mMethod.get());
+                fatal("Titanic is sinking! \r\n\t- Class: " + target.mClass.get() + "\r\n\t\t- Method: " + target.mMethod.get());
                 return null;
             }
 
