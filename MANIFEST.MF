@@ -1,0 +1,2 @@
+Main-Class: peacemaker.frameworkinjector.Main
+Class-Path: libs/jackson-annotations-2.13.1.jar libs/jackson-core-2.13.1.jar libs/jackson-databind-2.13.1.jar libs/javassist.jar
