@@ -1,0 +1,35 @@
+{
+    "pointcuts": [
+        {
+            "targetClass": "peacemaker\\.frameworkinjector\\..*Factory",
+            "targetMethod": ".*",
+            "insertBefore": " { System.out.println(\"peacemaker.sample: Wildcard test\"); } ",
+            "insertAfter": "",
+            "enable": true,
+            "version": 1,
+            "description": "Sample for wildcard test."
+        },
+        {
+            "targetClass": "peacemaker\\.frameworkinjector\\.EntryCopyConsumer",
+            "targetMethod": "accept",
+            "insertBefore": " { System.out.println(\"peacemaker.sample: onBefore accept\"); } ",
+            "insertAfter": " { System.out.println(\"peacemaker.sample: onAfter accept\"); } ",
+            "enable": true,
+            "version": 1,
+            "description": "Sample. But it would not work. FrameworkInjector now currently skip interface! Fix it in months."
+        }
+    ],
+    "pointcuts_disabled": [
+        {
+            "targetClass": "a\\.b\\.c",
+            "targetMethod": "foo",
+            "targetParams": ["String"],
+            "insertBefore": " ",
+            "insertAfter": " ",
+            "enable": true,
+            "version": 1,
+            "description": "Pointcut disabled."
+        }
+    ]
+}
+
